@@ -21,7 +21,7 @@ frame.pack(pady=20, padx=20, fill="both", expand=True)
 label = customtkinter.CTkLabel(master=frame, text="MES - Manufacturing Execution System", font=("Roboto", 24))
 label.pack(pady=12, padx=10)
 
-tabview = customtkinter.CTkTabview(master=frame, width=1000, height=600)
+tabview = customtkinter.CTkTabview(master=frame, width=870, height=500)
 tabview.pack(pady=12, padx=10)
 
 tab1 = tabview.add("Separador1")
