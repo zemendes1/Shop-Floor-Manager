@@ -38,13 +38,13 @@ Texto.configure(state="disabled")
 Right_Frame = customtkinter.CTkFrame(master=tab1, width=200, height=450)
 Right_Frame.grid(row=0, column=1, padx=0, pady=0)
 
-Check1 = customtkinter.CTkCheckBox(master=Right_Frame)
+Check1 = customtkinter.CTkCheckBox(master=Right_Frame, text="Botão 1")
 Check1.grid(row=0, column=0, padx=20, pady=20)
 
-Check2 = customtkinter.CTkCheckBox(master=Right_Frame)
+Check2 = customtkinter.CTkCheckBox(master=Right_Frame, text="Botão 2")
 Check2.grid(row=1, column=0, padx=20, pady=20)
 
-Check3 = customtkinter.CTkCheckBox(master=Right_Frame)
+Check3 = customtkinter.CTkCheckBox(master=Right_Frame, text="Botão 3")
 Check3.grid(row=2, column=0, padx=20, pady=20)
 
 """"
