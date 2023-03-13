@@ -13,11 +13,11 @@ mycursor.execute("CREATE TABLE IF NOT EXISTS students (name VARCHAR(250),age INT
 # mycursor.execute("SHOW TABLES")
 
 sqlFormula = "INSERT INTO students (name,age) VALUES (%s, %s)"
-student1 = [("Rachel", 27),
-            ("Vítor", 20),
-            ("Gavínio", 25),
-            ("Vimieiro", 24),
-            ("Jacaré", 21)
+student1 = [("Raquel", 12),
+            ("Viriato", 11),
+            ("Gaspar", 23),
+            ("Vento", 55),
+            ("João", 25)
             ]
 
 mycursor.executemany(sqlFormula, student1)
