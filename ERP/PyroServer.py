@@ -1,4 +1,3 @@
-# saved as greeting-server.py
 import Pyro4
 from Pyro4 import naming
 
