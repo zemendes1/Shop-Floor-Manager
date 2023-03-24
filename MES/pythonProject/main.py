@@ -1,20 +1,13 @@
 from gui import *
-import Pyro4
+from PyroClient import *
 
-run_gui()
+# run_gui()
+# run_pyro_client()
 
+# Experiência
+In_bool_value = None
+In_uint_value = None
+Out_uint_value = 70
+Out_bool_value = True
 
-# example Pyro4 Server
-
-@Pyro4.expose
-class GreetingMaker(object):
-    def get_fortune(self, name):
-        return "Hello, {0}. Here is your fortune message:\n" \
-               "Behold the warranty -- the bold print giveth and the fine print taketh away.".format(name)
-
-
-daemon = Pyro4.Daemon()  # make a Pyro daemon
-uri = daemon.register(GreetingMaker)  # register the greeting maker as a Pyro object
-
-print("Ready. Object uri =", uri)  # print the uri, so we can use it in the client later
-daemon.requestLoop()  # start the event loop of the server to wait for calls
+# exec(open("opcua.py").read())
