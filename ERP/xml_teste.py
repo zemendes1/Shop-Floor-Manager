@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import socket
+import time
 
 
 class Xml:
@@ -22,7 +23,7 @@ class Xml:
         self.latepen = []
         self.earlypen = []
 
-    def xml2string(self):
+    def run(self):
         try:
             self.data, self.addr = self.sock.recvfrom(self.buffer)
             self.data = self.data.decode(self.format)
@@ -30,7 +31,7 @@ class Xml:
         except socket.error:
             return False
 
-    def get_order(self):
+    def read_orders(self):
 
         self.root = ET.fromstring(self.data)
 
@@ -47,7 +48,54 @@ class Xml:
             self.earlypen.append(int(order.attrib["EarlyPen"]))
             self.i += 1
 
+        return self.i
+
+class Order:
+    def __init__(self):
+
+        self.nameID = None
+        self.number = []
+        self.workpiece = []
+        self.quantity = []
+        self.duedate = []
+        self.latepen = []
+        self.earlypen = []
+
+class Get_Orders:
+
+    def __init__(self):
+        self.orders = []
+
+
+def read_xml(get_orders):
+
+    start = time.time()
+    end = 0
+
+    while end - start < 20:
+        if xml.run():
+
+            for i in range(xml.read_orders()):
+                order = Order()
+                order.nameID = xml.nameID
+                order.number = xml.number[i]
+                order.workpiece = xml.workpiece[i]
+                order.quantity = xml.quantity[i]
+                order.duedate = xml.duedate[i]
+                order.latepen = xml.latepen[i]
+                order.earlypen = xml.earlypen[i]
+                get_orders.append(order)
+        end = time.time()
+
+
+
+
+# --------------------Inicializations-------------------------------#
+
 
 xml = Xml("127.0.0.1", 54321)
-xml.xml2string()
-xml.get_order()
+
+get_orders = Get_Orders()
+read_xml(get_orders)
+for i in range(len(get_orders.orders)):
+    print(get_orders.orders[i])
