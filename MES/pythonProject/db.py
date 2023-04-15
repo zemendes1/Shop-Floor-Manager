@@ -9,21 +9,6 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 
-"""""
-mycursor.execute("SHOW TABLES")
-
-mycursor.execute("CREATE TABLE IF NOT EXISTS students (name VARCHAR(250),age INTEGER(10))")
-sqlFormula = "INSERT INTO students (name,age) VALUES (%s, %s)"
-student1 = [("Raquel", 12),
-            ("Viriato", 11),
-            ("Gaspar", 23),
-            ("Vento", 55),
-            ("João", 25)
-            ]
-            
-mycursor.executemany(sqlFormula, student1)
-"""
-
 
 def create_table(_table):
     # CREATE TABLE
@@ -82,9 +67,57 @@ def create_table(_table):
     mycursor.execute(create_script)
 
 
+def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status):
+    new_order = "INSERT INTO orders" \
+                " (id, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status)" \
+                " VALUES ({}, '{}', {}, '{}', {}, {}, {}, {}, '{}', '{}');".format(id_order, client, ordernumber,
+                                                                                   workpiece,
+                                                                                   quantity, duedate, late_penalty,
+                                                                                   early_penalty, path, status)
+
+    mycursor.execute(new_order)
+
+
+def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
+    new_plan = "INSERT INTO dailyplan" \
+               " (date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy)" \
+               " VALUES ('{}', '{}', '{}', {}, {});".format(date, purchase_orders, delivery_orders, p1_tobuy,
+                                                            p2_tobuy)
+    mycursor.execute(new_plan)
+
+
+def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
+    new_facility = "INSERT INTO facilities" \
+                   " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9, worktime)" \
+                   " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8,
+                                                                                  p9, work_time)
+    mycursor.execute(new_facility)
+
+
+def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    new_dock = "INSERT INTO docks" \
+               " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
+               " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8, p9)
+    mycursor.execute(new_dock)
+
+
 create_table("orders")
-create_table("dailyPlan")
+create_table("dailyplan")
 create_table("facilitys")
 create_table("docks")
+
+""""
+# Testing add_order function
+add_order(1, 'Client AA', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
+
+# Testing add_daily_plan function
+add_daily_plan('2022-01-03', 'orders_9, orders_10', 'orders_11, orders_12', 75, 100)
+
+# Testing add_facility function
+add_facility(3, 50, 100, 150, 200, 250, 300, 350, 400, 450, 100)
+
+# Testing add_dock function
+add_dock(3, 5, 10, 15, 20, 25, 30, 35, 40, 45)
+"""
 
 mydb.commit()
