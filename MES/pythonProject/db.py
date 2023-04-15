@@ -3,8 +3,8 @@ import mysql.connector
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd="12password",
-    database="dbteste"
+    passwd="adminadmin",
+    database="test"
 )
 
 mycursor = mydb.cursor()
@@ -65,6 +65,7 @@ def create_table(_table):
                         "P9 INT CHECK (P9 >= 0)" \
                         ");"
     mycursor.execute(create_script)
+    mydb.commit()
 
 
 def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status):
@@ -76,14 +77,16 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
                                                                                    early_penalty, path, status)
 
     mycursor.execute(new_order)
+    mydb.commit()
     return 0
 
 
 def get_order(id_order):
     query = "SELECT * FROM orders WHERE id= {}".format(id_order)
     mycursor.execute(query)
-
-    return mycursor.fetchone()
+    order_values = mycursor.fetchone()
+    mydb.commit()
+    return order_values
 
 
 def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
@@ -92,13 +95,16 @@ def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
                " VALUES ('{}', '{}', '{}', {}, {});".format(date, purchase_orders, delivery_orders, p1_tobuy,
                                                             p2_tobuy)
     mycursor.execute(new_plan)
+    mydb.commit()
     return 0
 
 
 def get_daily_plan(date):
     query = "SELECT * FROM dailyplan WHERE date = '{}'".format(date)
     mycursor.execute(query)
-    return mycursor.fetchone()
+    daily_plan_values = mycursor.fetchone()
+    mydb.commit()
+    return daily_plan_values
 
 
 def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
@@ -107,13 +113,16 @@ def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
                    " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8,
                                                                                   p9, work_time)
     mycursor.execute(new_facility)
+    mydb.commit()
     return 0
 
 
 def get_facility(num):
     query = "SELECT * FROM facilities WHERE num = {}".format(num)
     mycursor.execute(query)
-    return mycursor.fetchone()
+    facility_values = mycursor.fetchone()
+    mydb.commit()
+    return facility_values
 
 
 def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
@@ -121,13 +130,16 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
                " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
                " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8, p9)
     mycursor.execute(new_dock)
+    mydb.commit()
     return 0
 
 
 def get_dock(num):
     query = "SELECT * FROM docks WHERE num = {}".format(num)
     mycursor.execute(query)
-    return mycursor.fetchone()
+    dock_values = mycursor.fetchone()
+    mydb.commit()
+    return dock_values
 
 
 create_table("orders")
@@ -157,5 +169,3 @@ print(get_p9_fac)
 get_num_dock, get_p1_dock, get_p2_dock, get_p3_dock, get_p4_dock, get_p5_dock, get_p6_dock, get_p7_dock, get_p8_dock, get_p9_dock = get_dock(3)
 print(get_p5_dock)
 """
-
-mydb.commit()

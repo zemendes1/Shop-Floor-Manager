@@ -1,8 +1,10 @@
-# from gui import *
+# import gui as gui
 # from PyroClient import *
+# import opcua as opcua
 
 # run_gui()
 # run_pyro_client()
 
-
-# exec(open("opcua.py").read())
+while True:
+    exec(open("opcua.py").read())
+    print("CONA")
