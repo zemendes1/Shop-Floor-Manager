@@ -36,7 +36,7 @@ def create_table(_table):
                         "P2_toBuy INT CHECK (P2_toBuy >= 0)" \
                         ");"
 
-    elif _table == "facilitys":
+    elif _table == "facilities":
         create_script = "CREATE TABLE IF NOT EXISTS facilities (" \
                         "num INT PRIMARY KEY," \
                         "P1 INT CHECK (P1 >= 0)," \
@@ -103,7 +103,7 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 create_table("orders")
 create_table("dailyplan")
-create_table("facilitys")
+create_table("facilities")
 create_table("docks")
 
 """"
