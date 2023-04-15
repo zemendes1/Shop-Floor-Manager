@@ -76,6 +76,14 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
                                                                                    early_penalty, path, status)
 
     mycursor.execute(new_order)
+    return 0
+
+
+def get_order(id_order):
+    query = "SELECT * FROM orders WHERE id= {}".format(id_order)
+    mycursor.execute(query)
+
+    return mycursor.fetchone()
 
 
 def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
@@ -84,6 +92,13 @@ def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
                " VALUES ('{}', '{}', '{}', {}, {});".format(date, purchase_orders, delivery_orders, p1_tobuy,
                                                             p2_tobuy)
     mycursor.execute(new_plan)
+    return 0
+
+
+def get_daily_plan(date):
+    query = "SELECT * FROM dailyplan WHERE date = '{}'".format(date)
+    mycursor.execute(query)
+    return mycursor.fetchone()
 
 
 def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
@@ -92,6 +107,13 @@ def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
                    " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8,
                                                                                   p9, work_time)
     mycursor.execute(new_facility)
+    return 0
+
+
+def get_facility(num):
+    query = "SELECT * FROM facilities WHERE num = {}".format(num)
+    mycursor.execute(query)
+    return mycursor.fetchone()
 
 
 def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
@@ -99,6 +121,13 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
                " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
                " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8, p9)
     mycursor.execute(new_dock)
+    return 0
+
+
+def get_dock(num):
+    query = "SELECT * FROM docks WHERE num = {}".format(num)
+    mycursor.execute(query)
+    return mycursor.fetchone()
 
 
 create_table("orders")
@@ -118,6 +147,15 @@ add_facility(3, 50, 100, 150, 200, 250, 300, 350, 400, 450, 100)
 
 # Testing add_dock function
 add_dock(3, 5, 10, 15, 20, 25, 30, 35, 40, 45)
+
+get_id_order, get_client, get_ordernumber, get_workpiece, get_quantity, get_duedate, get_late_penalty, get_early_penalty, get_path, get_status = get_order(1)
+print(get_status)
+get_date, get_purchase_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy = get_daily_plan('2022-01-03')
+print(get_date)
+get_num_fac, get_p1_fac, get_p2_fac, get_p3_fac, get_p4_fac, get_p5_fac, get_p6_fac, get_p7_fac, get_p8_fac, get_p9_fac, get_worktime_fac = get_facility(3)
+print(get_p9_fac)
+get_num_dock, get_p1_dock, get_p2_dock, get_p3_dock, get_p4_dock, get_p5_dock, get_p6_dock, get_p7_dock, get_p8_dock, get_p9_dock = get_dock(3)
+print(get_p5_dock)
 """
 
 mydb.commit()
