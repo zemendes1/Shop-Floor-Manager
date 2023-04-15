@@ -3,8 +3,8 @@ import mysql.connector
 mydb = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd="adminadmin",
-    database="test"
+    passwd="12password",
+    database="dbteste"
 )
 
 mycursor = mydb.cursor()
