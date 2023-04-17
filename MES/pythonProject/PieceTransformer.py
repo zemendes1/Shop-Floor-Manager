@@ -152,7 +152,16 @@ def define_vector(orderpiece):
         pathVector.append([0, 0])
         pathVector.append([0, 0])
 
+    if orderpiece == 'null':
+        pathVector.append([0, 0])
+        pathVector.append([0, 0])
+        pathVector.append([0, 0])
+        pathVector.append([0, 0])
+        pathVector.append([0, 0])
+
     return pathVector
 
 
+""""
 print(define_vector('P7_from_P2'))
+"""

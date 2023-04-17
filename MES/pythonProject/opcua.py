@@ -2,36 +2,51 @@ import asyncio
 from asyncua import Client
 from asyncua import ua
 import db
+import PieceTransformer as PT
 
 url = "opc.tcp://127.0.0.1:4840/"
 
 Write_bool_value = False
 
-# exemplo de uso da db
-get_num_dock, get_p1_dock, get_p2_dock, get_p3_dock, get_p4_dock, get_p5_dock, get_p6_dock, get_p7_dock, get_p8_dock, get_p9_dock = db.get_dock(3)
+# exemplo de uso da db e piece trasnformer
+get_date, get_purchase_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy = db.get_daily_plan(7)
+order1, order2, order3, order4 = get_delivery_orders.split(', ')
+order1 = PT.define_vector(order1)
+order2 = PT.define_vector(order2)
+order3 = PT.define_vector(order3)
+order4 = PT.define_vector(order4)
 
-Write_uint_value = get_p9_dock
+Write_uint_value = 0  # get_delivery_orders
 
 
 async def main():
     async with Client(url=url) as client:
-        # Read Boolean Value
-        node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Test")
-        Read_bool_value = await node.read_value()
 
-        # Read Uint16 Value
-        node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.vetor[0]")
-        Read_uint_value = await node.read_value()
+        # Write Order #1 of the day
+        for i in range(1, 6):
+            for j in range(1, 3):
+                node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE1[{}][{}]".format(i, j))
+                await node.write_value(ua.Variant(order1[i - 1][j - 1], ua.VariantType.Int16))
 
-        # Write Boolean Value
-        node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Test")
-        await node.write_value(ua.Variant(Write_bool_value, ua.VariantType.Boolean))
-
-        # Write Uint16 Value
-        node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.vetor[0]")
-        await node.write_value(ua.Variant(Write_uint_value, ua.VariantType.UInt16))
-        print(Read_bool_value)
-        print(Read_uint_value)
+        """"
+        # Write Order #3 of the day
+        for i in range(1, 6):
+            for j in range(1, 3):
+                node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE3[{}][{}]".format(i, j))
+                await node.write_value(ua.Variant(order3[i - 1][j - 1], ua.VariantType.Int16))
+                
+        # Write Order #2 of the day
+        for i in range(1, 6):
+            for j in range(1, 3):
+                node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE2[{}][{}]".format(i, j))
+                await node.write_value(ua.Variant(order2[i - 1][j - 1], ua.VariantType.Int16))
+                
+        # Write Order #4 of the day
+        for i in range(1, 6):
+            for j in range(1, 3):
+                node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE4[{}][{}]".format(i, j))
+                await node.write_value(ua.Variant(order4[i - 1][j - 1], ua.VariantType.Int16))                
+        """
 
 
 if __name__ == "__main__":
