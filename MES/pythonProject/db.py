@@ -1,14 +1,13 @@
-import mysql.connector
+import psycopg2
 
-mydb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="adminadmin",
-    database="test"
+mydb = psycopg2.connect(
+    host="db.fe.up.pt",
+    user="up201906869",
+    password="infi2023",
+    database="up201906869"
 )
 
 mycursor = mydb.cursor()
-
 
 def create_table(_table):
     # CREATE TABLE
