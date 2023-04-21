@@ -83,7 +83,7 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
 
 def get_order(id_order):
     if id_order is None:
-        query = "SELECT * FROM orders"
+        query = "SELECT * FROM orders ORDER BY id DESC"
         mycursor.execute(query)
         order_values = mycursor.fetchall()
         mydb.commit()
@@ -107,7 +107,7 @@ def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
 
 def get_daily_plan(date):
     if date is None:
-        query = "SELECT * FROM dailyplan"
+        query = "SELECT * FROM dailyplan ORDER BY date DESC"
         mycursor.execute(query)
         daily_plan_values = mycursor.fetchall()
         mydb.commit()
@@ -131,7 +131,7 @@ def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
 
 def get_facility(num):
     if num is None:
-        query = "SELECT * FROM facilities"
+        query = "SELECT * FROM facilities ORDER BY num DESC"
         mycursor.execute(query)
         facility_values = mycursor.fetchall()
         mydb.commit()
@@ -155,7 +155,7 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 def get_dock(num):
     if num is None:
-        query = "SELECT * FROM docks"
+        query = "SELECT * FROM docks ORDER BY num DESC"
         mycursor.execute(query)
         dock_values = mycursor.fetchall()
         mydb.commit()

@@ -247,14 +247,12 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Tab 2"))
         self.loaddata()
     def loaddata(self):
-        testeOrder = [{"id":"1","Client":"Cristiano","OrderNumber":"1","WorkPiece":"P1","Quantity":"2","DueDate":"2","Late_Penalty":"2","Early_Penalty":"2","path":"t1.t2","status":"WORKING"}
-                 ,{"id":"2","Client":"Rui","OrderNumber":"2","WorkPiece":"P2","Quantity":"4","DueDate":"1","Late_Penalty":"2","Early_Penalty":"2","path":"t4.t2","status":"WAITING"}]
-        testeDailyPlan = [{"date":"17/04","Purchase_orders":"5","Delivery_orders":"2","P1_toBuy":"1","P2_toBuy":"2"},
-                          {"date":"12/02","Purchase_orders":"4","Delivery_orders":"1","P1_toBuy":"2","P2_toBuy":"1"},
-                          {"date":"11/04","Purchase_orders":"2","Delivery_orders":"4","P1_toBuy":"1","P2_toBuy":"7"}]
-        testeFacilities =   db_to_interface.facilities(3)
 
-        testeDocks = [{"num":"2","P1":"4","P2":"2","P3":"1","P4":"0","P5":"0","P6":"1","P7":"0","P8":"1","P9":"0"}]
+        testeOrder = db_to_interface.orders(None)
+        testeDailyPlan = db_to_interface.daily_plan(None)
+        testeFacilities = db_to_interface.facilities(None)
+        testeDocks = db_to_interface.dock(None)
+
         rowOrder=0
         rowDailyPlan=0
         rowFacilities=0
