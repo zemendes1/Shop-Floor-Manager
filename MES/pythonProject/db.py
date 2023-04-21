@@ -9,6 +9,7 @@ mydb = psycopg2.connect(
 
 mycursor = mydb.cursor()
 
+
 def create_table(_table):
     # CREATE TABLE
     create_script = ""
@@ -81,10 +82,16 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
 
 
 def get_order(id_order):
-    query = "SELECT * FROM orders WHERE id= {}".format(id_order)
-    mycursor.execute(query)
-    order_values = mycursor.fetchone()
-    mydb.commit()
+    if id_order is None:
+        query = "SELECT * FROM orders"
+        mycursor.execute(query)
+        order_values = mycursor.fetchall()
+        mydb.commit()
+    else:
+        query = "SELECT * FROM orders WHERE id= {}".format(id_order)
+        mycursor.execute(query)
+        order_values = mycursor.fetchone()
+        mydb.commit()
     return order_values
 
 
@@ -99,10 +106,16 @@ def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
 
 
 def get_daily_plan(date):
-    query = "SELECT * FROM dailyplan WHERE date = '{}'".format(date)
-    mycursor.execute(query)
-    daily_plan_values = mycursor.fetchone()
-    mydb.commit()
+    if date is None:
+        query = "SELECT * FROM dailyplan"
+        mycursor.execute(query)
+        daily_plan_values = mycursor.fetchall()
+        mydb.commit()
+    else:
+        query = "SELECT * FROM dailyplan WHERE date = '{}'".format(date)
+        mycursor.execute(query)
+        daily_plan_values = mycursor.fetchone()
+        mydb.commit()
     return daily_plan_values
 
 
@@ -117,10 +130,17 @@ def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
 
 
 def get_facility(num):
-    query = "SELECT * FROM facilities WHERE num = {}".format(num)
-    mycursor.execute(query)
-    facility_values = mycursor.fetchone()
-    mydb.commit()
+    if num is None:
+        query = "SELECT * FROM facilities"
+        mycursor.execute(query)
+        facility_values = mycursor.fetchall()
+        mydb.commit()
+
+    else:
+        query = "SELECT * FROM facilities WHERE num = {}".format(num)
+        mycursor.execute(query)
+        facility_values = mycursor.fetchone()
+        mydb.commit()
     return facility_values
 
 
@@ -134,10 +154,16 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 
 def get_dock(num):
-    query = "SELECT * FROM docks WHERE num = {}".format(num)
-    mycursor.execute(query)
-    dock_values = mycursor.fetchone()
-    mydb.commit()
+    if num is None:
+        query = "SELECT * FROM docks"
+        mycursor.execute(query)
+        dock_values = mycursor.fetchall()
+        mydb.commit()
+    else:
+        query = "SELECT * FROM docks WHERE num = {}".format(num)
+        mycursor.execute(query)
+        dock_values = mycursor.fetchone()
+        mydb.commit()
     return dock_values
 
 
