@@ -2,7 +2,7 @@ import xml_teste
 
 
 class Order:
-    def __init__(self, number, workpiece, quantity, duedate, latepen, earlypen):
+    def __init__(self, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty):
         self.order_number = order_number
         self.workpiece_type = workpiece_type
         self.quantity = quantity
