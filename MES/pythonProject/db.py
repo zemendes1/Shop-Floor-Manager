@@ -90,6 +90,20 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
     return 0
 
 
+# update_query = "UPDATE facilities SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}," \
+#                  "worktime='{}' WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, time, num)
+
+def update_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path,
+                 status):
+    new_order = "UPDATE orders SET " \
+                "client='{}', ordernumber={}, workpiece='{}', quantity={}, duedate={}, late_penalty={}, early_penalty={}, path='{}', status='{}'" \
+                " WHERE id={}".format(client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty,
+                                      path, status, id_order)
+    mycursor.execute(new_order)
+    mydb.commit()
+    return 0
+
+
 def get_order(id_order):
     if id_order is None:
         query = "SELECT * FROM orders ORDER BY id DESC"
@@ -138,6 +152,14 @@ def get_daily_plan(date):
         daily_plan_values = mycursor.fetchone()
         mydb.commit()
     return daily_plan_values
+
+
+def update_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
+    update_plan = "UPDATE dailyplan SET purchase_orders = '{}', delivery_orders = '{}', p1_tobuy = {}, p2_tobuy = {}" \
+                  " WHERE date = '{}';".format(purchase_orders, delivery_orders, p1_tobuy, p2_tobuy, date)
+    mycursor.execute(update_plan)
+    mydb.commit()
+    return 0
 
 
 def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
@@ -265,6 +287,11 @@ add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
+#Test_Updates
+update_order(1, 'Client BB', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
+update_daily_plan(7, 'orders_1, orders_2', 'P3_from_P2, P3_from_P2, null, null', 75, 100)
+update_facility(4, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)
+update_dock(1, 1, 1, 2, 3, 4, 5, 0, 0, 0)
 
 # Example get and print get_id_order, get_client, get_ordernumber, get_workpiece, get_quantity, get_duedate, 
 get_late_penalty, get_early_penalty, get_path, get_status = get_order(1) 
