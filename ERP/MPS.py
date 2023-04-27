@@ -1,12 +1,18 @@
+import xml_teste
+
+
 class Order:
-    def __init__(self, name, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty):
-        self.name = name
+    def __init__(self, number, workpiece, quantity, duedate, latepen, earlypen):
         self.order_number = order_number
         self.workpiece_type = workpiece_type
         self.quantity = quantity
         self.due_date = due_date
         self.delay_penalty = delay_penalty
         self.advance_penalty = advance_penalty
+
+
+orders = []
+
 
 class Supplier:
     def __init__(self, name, workpiece_types, min_order, price_per_piece, delivery_time):
@@ -16,20 +22,39 @@ class Supplier:
         self.price_per_piece = price_per_piece
         self.delivery_time = delivery_time
 
-orders = [
-    Order('Client 1', 1, 'P1', 20, 10, 5, 0),
-    Order('Client 2', 2, 'P2', 15, 15, 10, 0),
-    Order('Client 3', 3, 'P1', 10, 5, 5, 0),
-    Order('Client 4', 4, 'P3', 30, 20, 5, 0),
-    Order('Client 5', 5, 'P5', 25, 10, 10, 0),
-    Order('Client 6', 6, 'P7', 15, 25, 10, 0)
-]
+
+# create a new instance of the Xml class
+xml = xml_teste.Xml("127.0.0.1", 54321)
+
+# receive the data from the UDP socket
+if xml.xml2string():
+    # extract the order values from the XML data
+    xml.get_order()
+
+    # access the order values using the instance attributes
+    for i in range(xml.i):
+        order_number = xml.number[i]
+        workpiece_type = xml.workpiece[i]
+        quantity = xml.quantity[i]
+        due_date = xml.duedate[i]
+        delay_penalty = xml.latepen[i]
+        advance_penalty = xml.earlypen[i]
+
+        order = Order(order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty)
+        orders.append(order)
+
+        # do something with the order values here
+        print(f"Order {order_number}: {quantity} units of {workpiece_type} due on {due_date}")
+else:
+    print("Failed to receive data from UDP socket")
+
 
 suppliers = [
     Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
+
 
 def generate_mps(orders, suppliers):
     # Initialize the master production schedule
@@ -77,6 +102,7 @@ def generate_mps(orders, suppliers):
 
     return mps
 
+
 def generate_production_plan(mps):
     production_plan = {}
     for item, item_data in mps.items():
@@ -93,6 +119,7 @@ def generate_production_plan(mps):
             production_plan[item] = {"P2": p2_qty, "P3": p3_qty, "P4": p4_qty,
                                      "P5": p5_qty, "P7": p7_qty, "P9": p9_qty}
     return production_plan
+
 
 def generate_purchasing_plan(mps):
     purchasing_plan = {}
@@ -134,6 +161,7 @@ def generate_purchasing_plan(mps):
 
 # TODO: implement database storage and retrieval functions
 
+
 # Example usage:
 mps = generate_mps(orders, suppliers)
 production_plan = generate_production_plan(mps)
@@ -142,17 +170,31 @@ purchasing_plan = generate_purchasing_plan(mps)
 # Display the orders, suppliers, MPS, production plan, and purchasing plan
 print("Orders:")
 for order in orders:
-    print(order.name, order.order_number, order.workpiece_type, order.quantity, order.due_date, order.delay_penalty, order.advance_penalty)
+    print(order.order_number, order.workpiece_type, order.quantity, order.due_date, order.delay_penalty, order.advance_penalty)
 
 print("Suppliers:")
 for supplier in suppliers:
     print(supplier.name, supplier.workpiece_types, supplier.min_order, supplier.price_per_piece, supplier.delivery_time)
 
 print("MPS:")
-# TODO: display the MPS
+for item, item_data in mps.items():
+    print("Item:", item)
+    for supplier, supplier_data in item_data["suppliers"].items():
+        print("  Supplier:", supplier)
+        print("    Quantity:", supplier_data["quantity"])
+        print("    Supplies P1:", supplier_data["supplies"]["P1"])
+        print("    Supplies P2:", supplier_data["supplies"]["P2"])
 
 print("Production Plan:")
-# TODO: display the production plan
+for work_center, work_center_data in production_plan.items():
+    print("Work Center:", work_center)
+    for workpiece_type, quantity in work_center_data.items():
+        print("  Workpiece Type:", workpiece_type)
+        print("  Quantity:", quantity)
 
 print("Purchasing Plan:")
-# TODO: display the purchasing plan
+for supplier, supplier_data in purchasing_plan.items():
+    print("Supplier:", supplier)
+    for workpiece_type, quantity in supplier_data.items():
+        print("  Workpiece Type:", workpiece_type)
+        print("  Quantity:", quantity)
