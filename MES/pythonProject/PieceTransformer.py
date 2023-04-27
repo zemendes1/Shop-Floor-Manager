@@ -25,7 +25,8 @@
 # Transformação4 → Tempo de Transformação
 
 def define_vector(orderpiece):
-    pathVector = []  # Categorias de transformação que a peça de origem tem de alcançar para se transformar na peça pedida
+    pathVector = []
+    # Categorias de transformação que a peça de origem tem de alcançar para se transformar na peça pedida
     if orderpiece == 'P3_from_P2':
         pathVector.append([3, 1])
         pathVector.append([2, 10])

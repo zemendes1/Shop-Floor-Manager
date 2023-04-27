@@ -7,4 +7,3 @@
 
 while True:
     exec(open("opcua.py").read())
-
