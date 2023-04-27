@@ -129,6 +129,14 @@ def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
     return 0
 
 
+def update_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
+    update_query = "UPDATE facilities SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}, worktime={} WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time, num)
+    mycursor.execute(update_query)
+    mydb.commit()
+    return 0
+
+
+
 def get_facility(num):
     if num is None:
         query = "SELECT * FROM facilities ORDER BY num DESC"
@@ -149,6 +157,12 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
                " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
                " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8, p9)
     mycursor.execute(new_dock)
+    mydb.commit()
+    return 0
+
+def update_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    update_query = "UPDATE docks SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={} WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, num)
+    mycursor.execute(update_query)
     mydb.commit()
     return 0
 
@@ -180,10 +194,14 @@ add_order(1, 'Client AA', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
 add_daily_plan(7, 'orders_9, orders_10', 'P3_from_P2, P3_from_P2, null, null', 75, 100)
 
 # Testing add_facility function
-add_facility(3, 50, 100, 150, 200, 250, 300, 350, 400, 450, 100)
+add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+add_facility(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+add_facility(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 # Testing add_dock function
-add_dock(3, 5, 10, 15, 20, 25, 30, 35, 40, 45)
+add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
 get_id_order, get_client, get_ordernumber, get_workpiece, get_quantity, get_duedate, get_late_penalty, get_early_penalty, get_path, get_status = get_order(1)
@@ -194,5 +212,5 @@ get_num_fac, get_p1_fac, get_p2_fac, get_p3_fac, get_p4_fac, get_p5_fac, get_p6_
 print(get_p9_fac)
 get_num_dock, get_p1_dock, get_p2_dock, get_p3_dock, get_p4_dock, get_p5_dock, get_p6_dock, get_p7_dock, get_p8_dock, get_p9_dock = get_dock(3)
 print(get_p5_dock)
-
 """
+
