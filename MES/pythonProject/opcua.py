@@ -26,10 +26,12 @@ machine2_p1, machine2_p2, machine2_p3, machine2_p4, machine2_p5, machine2_p6, ma
 
 # machine1_p1, machine1_p2, machine1_p3, machine1_p4, machine1_p5, machine1_p6, machine1_p7, machine1_p8, machine1_p9 = 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-
 async def main():
     machine_times = []
     machine_transforms = []
+    for i in range(5):
+        machine_transforms.append([0, 0, 0, 0, 0, 0, 0, 0, 0])
+
     async with Client(url=url) as client:
 
         # Write Order #1 of the day
@@ -52,9 +54,10 @@ async def main():
             for j in range(1, 9):
                 node = client.get_node(
                     "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Pecas_Produzidas_Maq[{}][{}]".format(i, j))
-                machine_transforms[i][j].append(await node.read_value())
+                machine_transforms[i][j] = await node.read_value()
 
-        machine1_p1, machine1_p2, machine1_p3, machine1_p4, machine1_p5, machine1_p6, machine1_p7, machine1_p8, machine1_p9 = Transformer.n_of_pieces(machine_transforms[1])
+        machine1_p1, machine1_p2, machine1_p3, machine1_p4, machine1_p5, machine1_p6, machine1_p7, machine1_p8, machine1_p9 = Transformer.n_of_pieces(
+            machine_transforms[1])
 
         db.update_facility(1, machine1_p1, machine1_p2, machine1_p3, machine1_p4, machine1_p5, machine1_p6, machine1_p7,
                            machine1_p8, machine1_p9, machine1_time)
