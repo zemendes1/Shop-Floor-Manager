@@ -14,7 +14,8 @@ def convert_string_facilities(input_str):
         "P7": values[7],
         "P8": values[8],
         "P9": values[9],
-        "workTime": values[10]
+        "workTime": values[10],
+        "Total ": str(int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(values[7]) + int(values[8]) + int(values[9]))
     }
     return result
 
@@ -79,6 +80,7 @@ def convert_string_dock(input_str):
         "P7": values[7],
         "P8": values[8],
         "P9": values[9],
+        "Total ": str(int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(values[7]) + int(values[8]) + int(values[9]))
     }
     return result
 
@@ -105,7 +107,7 @@ def convert_string_daily_plan(input_str):
         "Purchase_orders": str(values[1]),
         "Delivery_orders": str(values[2]),
         "P1_toBuy": str(values[3]),
-        "P2_toBuy": str(values[4]),
+        "P2_toBuy": str(values[4])
     }
     return result
 

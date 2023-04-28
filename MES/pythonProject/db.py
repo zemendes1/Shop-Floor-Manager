@@ -204,7 +204,7 @@ def update_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
 
 def get_facility(num):
     if num is None:
-        query = "SELECT * FROM facilities"
+        query = "SELECT * FROM facilities order by num asc"
         mycursor.execute(query)
         facility_values = mycursor.fetchall()
         mydb.commit()
@@ -250,7 +250,7 @@ def update_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 def get_dock(num):
     if num is None:
-        query = "SELECT * FROM docks"
+        query = "SELECT * FROM docks order by num asc"
         mycursor.execute(query)
         dock_values = mycursor.fetchall()
         mydb.commit()
