@@ -51,7 +51,10 @@ def create_table(_table):
                         "P9 INT CHECK (P9 >= 0)," \
                         "workTime TIME NOT NULL" \
                         ");"
-
+    elif _table == "facilities_total":
+        create_script = "CREATE VIEW facilities_total AS SELECT " \
+                        "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,workTime,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
+                        "FROM facilities;"
     elif _table == "docks":
         create_script = "CREATE TABLE IF NOT EXISTS docks (" \
                         "num INT PRIMARY KEY," \
@@ -65,6 +68,10 @@ def create_table(_table):
                         "P8 INT CHECK (P8 >= 0)," \
                         "P9 INT CHECK (P9 >= 0)" \
                         ");"
+    elif _table == "docks_total":
+        create_script = "CREATE VIEW docks_total AS SELECT " \
+                        "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
+                        "FROM docks;"
     mycursor.execute(create_script)
     mydb.commit()
 
@@ -269,7 +276,7 @@ create_table("orders")
 create_table("dailyplan")
 create_table("facilities")
 create_table("docks")
-
+create_table("docks_total")
 
 # Testing add_order function
 add_order(1, 'Client AA', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
