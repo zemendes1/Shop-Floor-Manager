@@ -80,7 +80,7 @@ def convert_string_dock(input_str):
         "P7": values[7],
         "P8": values[8],
         "P9": values[9],
-        "Total ": str(int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(values[7]) + int(values[8]) + int(values[9]))
+        "Total": str(int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(values[7]) + int(values[8]) + int(values[9]))
     }
     return result
 
