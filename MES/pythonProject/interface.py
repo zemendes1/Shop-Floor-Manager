@@ -9,8 +9,13 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QEventLoop, QTimer
 
 from MES.pythonProject import db_to_interface
+
+
+
+# Set up a function to check for new rows in the database and refresh the display
 
 
 class Ui_MainWindow(object):
@@ -276,12 +281,90 @@ class Ui_MainWindow(object):
 
 
         self.loaddata()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.updateMode)
+        self.timer.start(5000)
 
 
-# funcao que faz refresh periodicamente
-# verifica se a base de dados tem algum id novo em cada uma das tabelas
-# fazer um loaddata para cada uma das tabelas para poder controlar caso so houver atualizações
-# ou apagar as tabelas todas e dar refresh sempre periodicamente
+
+
+    def updateMode(self):
+        print("ola")
+        self.tableWidget.setRowCount(0)
+        self.tableWidget_2.setRowCount(0)
+        self.tableWidget_3.setRowCount(0)
+        self.tableWidget_4.setRowCount(0)
+        self.loaddata()
+
+    def loaddataOrder(self):
+        testeOrder = db_to_interface.order(None)
+        rowOrder = 0
+
+        self.tableWidget.setRowCount(len(testeOrder))
+        for order in testeOrder:
+            self.tableWidget.setItem(rowOrder, 0, QtWidgets.QTableWidgetItem(order["id"]))
+            self.tableWidget.setItem(rowOrder, 1, QtWidgets.QTableWidgetItem(order["Client"]))
+            self.tableWidget.setItem(rowOrder, 2, QtWidgets.QTableWidgetItem(order["OrderNumber"]))
+            self.tableWidget.setItem(rowOrder, 3, QtWidgets.QTableWidgetItem(order["WorkPiece"]))
+            self.tableWidget.setItem(rowOrder, 4, QtWidgets.QTableWidgetItem(order["Quantity"]))
+            self.tableWidget.setItem(rowOrder, 5, QtWidgets.QTableWidgetItem(order["DueDate"]))
+            self.tableWidget.setItem(rowOrder, 6, QtWidgets.QTableWidgetItem(order["Late_Penalty"]))
+            self.tableWidget.setItem(rowOrder, 7, QtWidgets.QTableWidgetItem(order["Early_Penalty"]))
+            self.tableWidget.setItem(rowOrder, 8, QtWidgets.QTableWidgetItem(order["path"]))
+            self.tableWidget.setItem(rowOrder, 9, QtWidgets.QTableWidgetItem(order["status"]))
+            rowOrder = rowOrder + 1
+
+    def loaddataDailyPlan(self):
+        testeDailyPlan = db_to_interface.daily_plan(None)
+        rowDailyPlan = 0
+
+        self.tableWidget_2.setRowCount(len(testeDailyPlan))
+        for DailyPlan in testeDailyPlan:
+            self.tableWidget_2.setItem(rowDailyPlan, 0, QtWidgets.QTableWidgetItem(DailyPlan["date"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 1, QtWidgets.QTableWidgetItem(DailyPlan["Purchase_orders"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 2, QtWidgets.QTableWidgetItem(DailyPlan["Delivery_orders"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 3, QtWidgets.QTableWidgetItem(DailyPlan["P1_toBuy"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 4, QtWidgets.QTableWidgetItem(DailyPlan["P2_toBuy"]))
+            rowDailyPlan = rowDailyPlan + 1
+
+    def loaddataFacilities(self):
+        testeFacilities = db_to_interface.facilities(None)
+        rowFacilities = 0
+
+        self.tableWidget_3.setRowCount((len(testeFacilities)))
+        for Facilities in testeFacilities:
+            self.tableWidget_3.setItem(rowFacilities, 0, QtWidgets.QTableWidgetItem(Facilities["num"]))
+            self.tableWidget_3.setItem(rowFacilities, 1, QtWidgets.QTableWidgetItem(Facilities["P1"]))
+            self.tableWidget_3.setItem(rowFacilities, 2, QtWidgets.QTableWidgetItem(Facilities["P2"]))
+            self.tableWidget_3.setItem(rowFacilities, 3, QtWidgets.QTableWidgetItem(Facilities["P3"]))
+            self.tableWidget_3.setItem(rowFacilities, 4, QtWidgets.QTableWidgetItem(Facilities["P4"]))
+            self.tableWidget_3.setItem(rowFacilities, 5, QtWidgets.QTableWidgetItem(Facilities["P5"]))
+            self.tableWidget_3.setItem(rowFacilities, 6, QtWidgets.QTableWidgetItem(Facilities["P6"]))
+            self.tableWidget_3.setItem(rowFacilities, 7, QtWidgets.QTableWidgetItem(Facilities["P7"]))
+            self.tableWidget_3.setItem(rowFacilities, 8, QtWidgets.QTableWidgetItem(Facilities["P8"]))
+            self.tableWidget_3.setItem(rowFacilities, 9, QtWidgets.QTableWidgetItem(Facilities["P9"]))
+            self.tableWidget_3.setItem(rowFacilities, 10, QtWidgets.QTableWidgetItem(Facilities["workTime"]))
+            rowFacilities = rowFacilities + 1
+
+    def loaddataDocks(self):
+        testeDocks = db_to_interface.dock(None)
+        rowDocks = 0
+
+        self.tableWidget_4.setRowCount((len(testeDocks)))
+        for Docks in testeDocks:
+            self.tableWidget_4.setItem(rowDocks, 0, QtWidgets.QTableWidgetItem(Docks["num"]))
+            self.tableWidget_4.setItem(rowDocks, 1, QtWidgets.QTableWidgetItem(Docks["P1"]))
+            self.tableWidget_4.setItem(rowDocks, 2, QtWidgets.QTableWidgetItem(Docks["P2"]))
+            self.tableWidget_4.setItem(rowDocks, 3, QtWidgets.QTableWidgetItem(Docks["P3"]))
+            self.tableWidget_4.setItem(rowDocks, 4, QtWidgets.QTableWidgetItem(Docks["P4"]))
+            self.tableWidget_4.setItem(rowDocks, 5, QtWidgets.QTableWidgetItem(Docks["P5"]))
+            self.tableWidget_4.setItem(rowDocks, 6, QtWidgets.QTableWidgetItem(Docks["P6"]))
+            self.tableWidget_4.setItem(rowDocks, 7, QtWidgets.QTableWidgetItem(Docks["P7"]))
+            self.tableWidget_4.setItem(rowDocks, 8, QtWidgets.QTableWidgetItem(Docks["P8"]))
+            self.tableWidget_4.setItem(rowDocks, 9, QtWidgets.QTableWidgetItem(Docks["P9"]))
+            self.tableWidget_4.setItem(rowDocks, 10, QtWidgets.QTableWidgetItem(Docks["Total"]))
+            rowDocks = rowDocks + 1
+
     def loaddata(self):
         testeOrder = db_to_interface.orders(None)
         testeDailyPlan = db_to_interface.daily_plan(None)
