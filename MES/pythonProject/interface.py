@@ -289,7 +289,6 @@ class Ui_MainWindow(object):
 
 
     def updateMode(self):
-        print("ola")
         self.tableWidget.setRowCount(0)
         self.tableWidget_2.setRowCount(0)
         self.tableWidget_3.setRowCount(0)
@@ -371,6 +370,7 @@ class Ui_MainWindow(object):
         testeFacilities = db_to_interface.facilities(None)
         testeDocks = db_to_interface.dock(None)
 
+
         rowOrder = 0
         rowDailyPlan = 0
         rowFacilities = 0
@@ -412,6 +412,7 @@ class Ui_MainWindow(object):
             self.tableWidget_3.setItem(rowFacilities, 8, QtWidgets.QTableWidgetItem(Facilities["P8"]))
             self.tableWidget_3.setItem(rowFacilities, 9, QtWidgets.QTableWidgetItem(Facilities["P9"]))
             self.tableWidget_3.setItem(rowFacilities, 10, QtWidgets.QTableWidgetItem(Facilities["workTime"]))
+            self.tableWidget_3.setItem(rowFacilities, 11, QtWidgets.QTableWidgetItem(Facilities["Total"]))
             rowFacilities = rowFacilities + 1
 
         for Docks in testeDocks:
