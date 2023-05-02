@@ -1,4 +1,7 @@
 import xml_teste
+import INFI.MES.pythonProject.db
+
+
 
 
 class Order:
@@ -21,6 +24,7 @@ class Supplier:
         self.min_order = min_order
         self.price_per_piece = price_per_piece
         self.delivery_time = delivery_time
+
 
 
 # create a new instance of the Xml class
@@ -159,13 +163,36 @@ def generate_purchasing_plan(mps):
                             supplier_qty -= min_order
     return purchasing_plan
 
-# TODO: implement database storage and retrieval functions
 
-
-# Example usage:
 mps = generate_mps(orders, suppliers)
 production_plan = generate_production_plan(mps)
 purchasing_plan = generate_purchasing_plan(mps)
+
+
+INFI.MES.pythonProject.db.create_table("dailyplan")
+
+# loop through the orders and add a daily plan entry for each one
+for order in orders:
+    workpiece_type = order.workpiece_type
+    quantity = order.quantity
+    purchasing_quantity = purchasing_plan[workpiece_type]
+    production_quantity = production_plan[workpiece_type]
+
+    # add a daily plan entry for P1
+    if workpiece_type == "P1":
+        INFI.MES.pythonProject.db.add_daily_plan(order.due_date,
+                                                 purchasing_quantity,
+                                                 production_quantity,
+                                                 purchasing_quantity,
+                                                 0)
+    # add a daily plan entry for P2
+    elif workpiece_type == "P2":
+        INFI.MES.pythonProject.db.add_daily_plan(order.due_date,
+                                                 purchasing_quantity,
+                                                 production_quantity,
+                                                 0,
+                                                 purchasing_quantity)
+
 
 # Display the orders, suppliers, MPS, production plan, and purchasing plan
 print("Orders:")
@@ -186,11 +213,9 @@ for item, item_data in mps.items():
         print("    Supplies P2:", supplier_data["supplies"]["P2"])
 
 print("Production Plan:")
-for work_center, work_center_data in production_plan.items():
-    print("Work Center:", work_center)
-    for workpiece_type, quantity in work_center_data.items():
-        print("  Workpiece Type:", workpiece_type)
-        print("  Quantity:", quantity)
+for workpiece_type, quantity in production_plan.items():
+    print("Workpiece Type:", workpiece_type)
+    print("Quantity:", quantity)
 
 print("Purchasing Plan:")
 for supplier, supplier_data in purchasing_plan.items():
