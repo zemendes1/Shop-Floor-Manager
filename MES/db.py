@@ -1,6 +1,7 @@
 import psycopg2
 import datetime
 
+
 mydb = psycopg2.connect(
     host="db.fe.up.pt",
     user="up201906869",
