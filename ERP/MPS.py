@@ -2,8 +2,6 @@ import receive_xml
 import MES.db as database
 
 
-
-
 class Order:
     def __init__(self, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty):
         self.order_number = order_number
@@ -15,6 +13,11 @@ class Order:
 
 
 orders = []
+done_ids = []
+xml_orders = database.get_order(None)
+for record in xml_orders:
+    # Create a new Order object from the record
+    orders = Order(*record)
 
 
 class Supplier:
@@ -24,33 +27,6 @@ class Supplier:
         self.min_order = min_order
         self.price_per_piece = price_per_piece
         self.delivery_time = delivery_time
-
-
-
-# create a new instance of the Xml class
-xml = receive_xml.Xml("127.0.0.1", 54321)
-
-# receive the data from the UDP socket
-if xml.xml2string():
-    # extract the order values from the XML data
-    xml.get_order()
-
-    # access the order values using the instance attributes
-    for i in range(xml.i):
-        order_number = xml.number[i]
-        workpiece_type = xml.workpiece[i]
-        quantity = xml.quantity[i]
-        due_date = xml.duedate[i]
-        delay_penalty = xml.latepen[i]
-        advance_penalty = xml.earlypen[i]
-
-        order = Order(order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty)
-        orders.append(order)
-
-        # do something with the order values here
-        print(f"Order {order_number}: {quantity} units of {workpiece_type} due on {due_date}")
-else:
-    print("Failed to receive data from UDP socket")
 
 
 suppliers = [
@@ -180,16 +156,15 @@ for order in orders:
 
     # add a daily plan entry for P1
     if workpiece_type == "P1":
-        database.add_daily_plan(order.due_date,
-                                                 purchasing_quantity,
-                                                 production_quantity,
+        database.add_daily_plan(order.due_date, "P1",
+                                                 order.workpiece_type,
                                                  purchasing_quantity,
                                                  0)
     # add a daily plan entry for P2
     elif workpiece_type == "P2":
         database.add_daily_plan(order.due_date,
-                                                 purchasing_quantity,
-                                                 production_quantity,
+                                                 "P2",
+                                                 order.workpiece_type,
                                                  0,
                                                  purchasing_quantity)
 
