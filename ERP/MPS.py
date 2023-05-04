@@ -1,5 +1,5 @@
-import xml_teste
-import INFI.MES.pythonProject.db
+import receive_xml
+import MES.db as database
 
 
 
@@ -28,7 +28,7 @@ class Supplier:
 
 
 # create a new instance of the Xml class
-xml = xml_teste.Xml("127.0.0.1", 54321)
+xml = receive_xml.Xml("127.0.0.1", 54321)
 
 # receive the data from the UDP socket
 if xml.xml2string():
@@ -169,7 +169,7 @@ production_plan = generate_production_plan(mps)
 purchasing_plan = generate_purchasing_plan(mps)
 
 
-INFI.MES.pythonProject.db.create_table("dailyplan")
+database.create_table("dailyplan")
 
 # loop through the orders and add a daily plan entry for each one
 for order in orders:
@@ -180,14 +180,14 @@ for order in orders:
 
     # add a daily plan entry for P1
     if workpiece_type == "P1":
-        INFI.MES.pythonProject.db.add_daily_plan(order.due_date,
+        database.add_daily_plan(order.due_date,
                                                  purchasing_quantity,
                                                  production_quantity,
                                                  purchasing_quantity,
                                                  0)
     # add a daily plan entry for P2
     elif workpiece_type == "P2":
-        INFI.MES.pythonProject.db.add_daily_plan(order.due_date,
+        database.add_daily_plan(order.due_date,
                                                  purchasing_quantity,
                                                  production_quantity,
                                                  0,

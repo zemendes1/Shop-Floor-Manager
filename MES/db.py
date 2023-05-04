@@ -1,7 +1,6 @@
 import psycopg2
 import datetime
 
-
 mydb = psycopg2.connect(
     host="db.fe.up.pt",
     user="up201906869",
@@ -54,7 +53,8 @@ def create_table(_table):
                         ");"
     elif _table == "facilities_total":
         create_script = "CREATE VIEW facilities_total AS SELECT " \
-                        "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,workTime,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
+                        "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,workTime,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) " \
+                        "AS Total " \
                         "FROM facilities;"
     elif _table == "docks":
         create_script = "CREATE TABLE IF NOT EXISTS docks (" \
@@ -104,7 +104,8 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
 def update_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path,
                  status):
     new_order = "UPDATE orders SET " \
-                "client='{}', ordernumber={}, workpiece='{}', quantity={}, duedate={}, late_penalty={}, early_penalty={}, path='{}', status='{}'" \
+                "client='{}', ordernumber={}, workpiece='{}', quantity={}, duedate={}, late_penalty={}," \
+                " early_penalty={}, path='{}', status='{}'" \
                 " WHERE id={}".format(client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty,
                                       path, status, id_order)
     mycursor.execute(new_order)
@@ -263,6 +264,20 @@ def get_dock(num):
     return dock_values
 
 
+def reset_db():
+    query = "DELETE FROM docks; DELETE FROM facilities; DELETE FROM orders; DELETE FROM dailyplan;"
+    mycursor.execute(query)
+    mydb.commit()
+
+    add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_facility(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_facility(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+
 def convert_ms_to_postgre_time(ms):
     delta = datetime.timedelta(milliseconds=ms)
     microseconds = delta.microseconds
@@ -313,3 +328,4 @@ get_num_dock, get_p1_dock, get_p2_dock, get_p3_dock, get_p4_dock, get_p5_dock, g
 get_p9_dock = get_dock(2)
 print(get_p5_dock)
 """
+

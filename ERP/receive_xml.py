@@ -1,4 +1,4 @@
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as et
 import socket
 import MES.db
 
@@ -42,7 +42,7 @@ class Xml:
         self.latepen = []
         self.earlypen = []
 
-        self.root = ET.fromstring(self.data)
+        self.root = et.fromstring(self.data)
 
         self.nameID = self.root.find("Client").attrib["NameId"]
 
@@ -57,10 +57,14 @@ class Xml:
         return self.nameID, self.number, self.workpiece, self.quantity, self.duedate, self.latepen, self.earlypen
 
 
-xml = Xml("127.0.0.1", 54321)
+def run_xml():
+    xml = Xml("127.0.0.1", 54321)
+    while True:
+        xml.xml2string()
+        nameID, number, workpiece, quantity, duedate, latepen, earlypen = xml.get_order()
+        for i in range(len(number)):
+            MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
+                             earlypen[i], '{}', 'TBD')
 
-while True:
-    xml.xml2string()
-    nameID, number, workpiece, quantity, duedate, latepen, earlypen = xml.get_order()
-    for i in range(len(number)):
-        MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i], earlypen[i], '{}', 'TBD')
+
+run_xml()
