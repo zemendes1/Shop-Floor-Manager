@@ -1,9 +1,13 @@
-# import gui as gui
-# from PyroClient import *
-# import opcua as opcua
+from MES import opcua
+from MES import interface
 
-# run_gui()
-# run_pyro_client()
+
+# ui = inter.Ui_MainWindow()
 
 while True:
-    exec(open("opcua.py").read())
+    print("zan")
+    interface.run_interface()
+    #opcua.run_opcua()
+
+    #exec(open("opcua.py").read())
+

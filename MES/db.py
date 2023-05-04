@@ -25,9 +25,17 @@ def create_table(_table):
                         "Late_Penalty INT," \
                         "Early_Penalty INT," \
                         "path varchar(40)," \
-                        "status varchar(40) NOT NULL" \
+                        "status varchar(40) CHECK ('status = TBD' OR status='DONE' OR status='IN_PROGRESS')NOT NULL" \
                         ");"
-
+    elif _table == "order_status":
+        create_script = " CREATE TABLE IF NOT EXISTS order_status(" \
+                        "id INT PRIMARY KEY," \
+                        "OrderNumber INT," \
+                        "done_pieces varchar(40) NOT NULL," \
+                        "pending_pieces varchar(40) NOT NULL," \
+                        "total INT not null," \
+                        "total_production_time TIME not null" \
+                        ");"
     elif _table == "dailyplan":
         create_script = "CREATE TABLE IF NOT EXISTS dailyPlan (" \
                         "date INT CHECK (date >=0)," \
@@ -73,6 +81,11 @@ def create_table(_table):
         create_script = "CREATE VIEW docks_total AS SELECT " \
                         "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
                         "FROM docks;"
+
+    elif _table == "current_order_list":
+        create_script = "CREATE VIEW in_progress_view AS SELECT id, client, ordernumber, workpiece, quantity," \
+                        " duedate, late_penalty, early_penalty, path, status " \
+                        "FROM orders WHERE status = 'IN_PROGRESS';"
     mycursor.execute(create_script)
     mydb.commit()
 
@@ -328,4 +341,3 @@ get_num_dock, get_p1_dock, get_p2_dock, get_p3_dock, get_p4_dock, get_p5_dock, g
 get_p9_dock = get_dock(2)
 print(get_p5_dock)
 """
-

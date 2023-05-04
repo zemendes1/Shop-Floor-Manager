@@ -10,7 +10,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
-
+import sys
 from MES import db_to_interface
 
 
@@ -429,8 +429,8 @@ class Ui_MainWindow(object):
             rowDocks = rowDocks + 1
 
 
-if __name__ == "__main__":
-    import sys
+##if __name__ == "__main__":
+def run_interface():
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()

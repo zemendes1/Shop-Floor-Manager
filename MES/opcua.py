@@ -81,5 +81,6 @@ async def main():
         node.write_value(ua.Variant(order4[i - 1][j - 1], ua.VariantType.Int16))"""
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def run_opcua():
     asyncio.run(main())

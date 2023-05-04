@@ -65,6 +65,6 @@ def run_xml():
         for i in range(len(number)):
             MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
                              earlypen[i], '{}', 'TBD')
-
+# TBD, IN_PROGRESS , DONE
 
 run_xml()
