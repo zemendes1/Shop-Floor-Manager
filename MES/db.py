@@ -1,5 +1,6 @@
 import psycopg2
 import datetime
+import math
 
 mydb = psycopg2.connect(
     host="db.fe.up.pt",
@@ -76,6 +77,11 @@ def create_table(_table):
                         "P7 INT CHECK (P7 >= 0)," \
                         "P8 INT CHECK (P8 >= 0)," \
                         "P9 INT CHECK (P9 >= 0)" \
+                        ");"
+    elif _table == "day":
+        create_script = "CREATE TABLE IF NOT EXISTS day (" \
+                        "day INT not null," \
+                        "time_elapsed TIME NOT NULL " \
                         ");"
     elif _table == "docks_total":
         create_script = "CREATE VIEW docks_total AS SELECT " \
@@ -300,12 +306,42 @@ def convert_ms_to_postgre_time(ms):
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds:03d}"
 
 
+def insert_or_update_time(elapsed_time):
+    # check if row already exists for this day
+    mycursor.execute("SELECT * FROM day")
+    existing_row = mycursor.fetchone()
+
+    # Define the number of milliseconds in a day
+    MILLISECONDS_PER_DAY = 60 * 1000
+    # Calculate the number of days
+    current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY)
+
+    if existing_row:
+        # update existing row with new day and time_elapsed values
+        mycursor.execute("UPDATE day SET day={}, time_elapsed='{}'".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
+        mydb.commit()
+    else:
+        # insert new row with day and time_elapsed values
+        mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES ({}, '{}')".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
+        mydb.commit()
+
+
+def get_day():
+    query = "SELECT day FROM day"
+    mycursor.execute(query)
+    dia = mycursor.fetchall()
+    if dia is not None:
+        return dia[0][0]
+    else:
+        return 0
+
+
 """"
 create_table("orders")
 create_table("dailyplan")
 create_table("facilities")
 create_table("docks")
-create_table("docks_total")
+create_table("day")
 
 # Testing add_order function
 add_order(1, 'Client AA', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
