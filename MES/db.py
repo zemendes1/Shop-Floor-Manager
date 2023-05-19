@@ -83,6 +83,18 @@ def create_table(_table):
                         "day INT not null," \
                         "time_elapsed TIME NOT NULL " \
                         ");"
+    elif _table == "warehouse":
+        create_script = "CREATE TABLE IF NOT EXISTS warehouse (" \
+                        "P1 INT CHECK (P1 >= 0)," \
+                        "P2 INT CHECK (P2 >= 0)," \
+                        "P3 INT CHECK (P3 >= 0)," \
+                        "P4 INT CHECK (P4 >= 0)," \
+                        "P5 INT CHECK (P5 >= 0)," \
+                        "P6 INT CHECK (P6 >= 0)," \
+                        "P7 INT CHECK (P7 >= 0)," \
+                        "P8 INT CHECK (P8 >= 0)," \
+                        "P9 INT CHECK (P9 >= 0)" \
+                        ");"
     elif _table == "docks_total":
         create_script = "CREATE VIEW docks_total AS SELECT " \
                         "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
@@ -357,12 +369,31 @@ def get_day():
         return 0
 
 
+def add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    new_warehouse = "INSERT INTO warehouse" \
+                    " (p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
+                    " VALUES ( {}, {}, {}, {}, {}, {}, {}, {}, {});".format(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+    mycursor.execute(new_warehouse)
+    mydb.commit()
+    return 0
+
+
+def update_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    update_query = "DELETE FROM warehouse"
+    mycursor.execute(update_query)
+    mydb.commit()
+    add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+    return 0
+
+
 """"
 create_table("orders")
 create_table("dailyplan")
 create_table("facilities")
 create_table("docks")
 create_table("day")
+create_table("warehouse")
+
 
 # Testing add_order function
 add_order(1, 'Client AA', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
@@ -380,11 +411,15 @@ add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
+#Test Warehouse
+add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
+
 #Test_Updates
 update_order(1, 'Client BB', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
 update_daily_plan(7, 'orders_1, orders_2', 'P3_from_P2, P3_from_P2, null, null', 75, 100)
 update_facility(4, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)
 update_dock(1, 1, 1, 2, 3, 4, 5, 0, 0, 0)
+update_warehouse(1, 2, 3, 4, 5, 6, 7, 8, 9)
 
 # Example get and print get_id_order, get_client, get_ordernumber, get_workpiece, get_quantity, get_duedate, 
 get_late_penalty, get_early_penalty, get_path, get_status = get_order(1) 
