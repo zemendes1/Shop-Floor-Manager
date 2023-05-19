@@ -386,6 +386,17 @@ def update_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
     return 0
 
 
+def get_warehouse(text):
+    if text is None:
+        query = "SELECT * FROM warehouse"
+        mycursor.execute(query)
+        warehouse_values = mycursor.fetchall()
+        mydb.commit()
+        return warehouse_values
+    else:
+        return 'Error'
+
+
 """"
 create_table("orders")
 create_table("dailyplan")
