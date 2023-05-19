@@ -146,6 +146,24 @@ def get_order(id_order):
     return order_values
 
 
+def get_order_status(status_of_order):
+    if status_of_order in ('TBD', 'DONE', 'IN_PROGRESS'):
+        query = "SELECT * FROM orders WHERE status = %s ORDER BY id DESC"
+        mycursor.execute(query, (status_of_order,))
+        order_values = mycursor.fetchall()
+        mydb.commit()
+        return order_values
+    else:
+        return 'ERROR'
+
+
+def update_order_status(order, new_status):
+    query = "UPDATE orders SET status = '{}' WHERE id = '{}';".format(new_status, order)
+    mycursor.execute(query)
+    mydb.commit()
+    return 0
+
+
 def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
     # Check if entry with given date already exists
     mycursor.execute("SELECT * FROM dailyplan WHERE date = %s", (date,))
@@ -318,11 +336,14 @@ def insert_or_update_time(elapsed_time):
 
     if existing_row:
         # update existing row with new day and time_elapsed values
-        mycursor.execute("UPDATE day SET day={}, time_elapsed='{}'".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
+        mycursor.execute(
+            "UPDATE day SET day={}, time_elapsed='{}'".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
         mydb.commit()
     else:
         # insert new row with day and time_elapsed values
-        mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES ({}, '{}')".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
+        mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES ({}, '{}')".format(current_day,
+                                                                                        convert_ms_to_postgre_time(
+                                                                                            elapsed_time)))
         mydb.commit()
 
 
