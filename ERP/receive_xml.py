@@ -59,12 +59,12 @@ class Xml:
 
 def run_xml():
     xml = Xml("127.0.0.1", 54321)
-    while True:
-        xml.xml2string()
-        nameID, number, workpiece, quantity, duedate, latepen, earlypen = xml.get_order()
-        for i in range(len(number)):
-            MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
-                             earlypen[i], '{}', 'TBD')
+    # while True:
+    xml.xml2string()
+    nameID, number, workpiece, quantity, duedate, latepen, earlypen = xml.get_order()
+    for i in range(len(number)):
+        MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
+                         earlypen[i], '{}', 'TBD')
 # TBD, IN_PROGRESS , DONE
 
-run_xml()
+#run_xml()

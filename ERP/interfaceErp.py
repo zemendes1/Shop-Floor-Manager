@@ -10,6 +10,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
+import sys
 
 from MES import db_to_interface as db_to_interface
 
@@ -182,11 +183,14 @@ class Ui_MainWindow(object):
         self.CurrentDate.setText(newDate)
 
 
-if __name__ == "__main__":
-    import sys
+
+def setup_interface():
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+if __name__ == "__main__":
+    setup_interface()
