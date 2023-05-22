@@ -11,6 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 import sys
+from MES import db
 
 from MES import db_to_interface as db_to_interface
 
@@ -179,8 +180,7 @@ class Ui_MainWindow(object):
 
 
     def SetDATA(self):
-        newDate = "1"
-        self.CurrentDate.setText(newDate)
+        self.CurrentDate.setText(db.get_day())
 
 
 
