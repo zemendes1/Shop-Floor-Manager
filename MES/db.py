@@ -420,4 +420,3 @@ def erase_facilities():
     mycursor.execute(query)
     mydb.commit()
 
-add_daily_plan(7, 'orders_1, orders_2', 'P3_from_P2, P3_from_P2, null, null', 75, 100)
