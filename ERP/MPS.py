@@ -40,7 +40,7 @@ suppliers = [
 ]
 
 orders = database.get_order_status('TBD')
-print(orders)
+#print(orders)
 
 
 def generate_mps(orders, suppliers, day):
@@ -138,14 +138,13 @@ def generate_mps(orders, suppliers, day):
     return mps
 
 
-def generate_purchasing_plan(mps, suppliers, stock):
+def generate_purchasing_plan(orders, suppliers):
     purchasing_plan = {}
 
-    for data in mps:
-        workpiece_type = data["workpiece"]
-        quantity = data["quantity"]
-        print("workpiece_type:", workpiece_type)
-        print("quantity:", quantity)
+    # Collect the quantities of required workpieces P1 and P2 from the orders
+    for order in orders:
+        workpiece_type = order[3]
+        quantity = order[4]
 
         # Determine the appropriate workpiece type to order based on the given workpiece type
         if workpiece_type in ["P6", "P8"]:
@@ -153,50 +152,43 @@ def generate_purchasing_plan(mps, suppliers, stock):
         else:
             required_workpiece_type = "P2"
 
-        print("required_workpiece_type:", required_workpiece_type)
+        # Add the quantity to the purchasing plan for the corresponding workpiece type
+        purchasing_plan.setdefault(required_workpiece_type, 0)
+        purchasing_plan[required_workpiece_type] += quantity
 
-        # Find the orders for the required workpiece type
-        relevant_orders = [order_data for order_data in mps if order_data["workpiece"] == required_workpiece_type]
-        print("relevant_orders:", relevant_orders)
+    # Adjust the quantity to ensure a minimum order quantity of 4 units
+    for workpiece_type in purchasing_plan.keys():
+        purchasing_plan[workpiece_type] = max(purchasing_plan[workpiece_type], 4)
 
-        # Calculate the required quantity by summing the quantities of relevant orders
-        required_quantity = sum(order_data["quantity"] for order_data in relevant_orders) if relevant_orders else 0
-        print("required_quantity:", required_quantity)
-        required_quantity = max(required_quantity, 4)  # Set the required quantity to at least 4
-
-        # Check if the required workpiece type is already available in stock
-        available_pieces = stock[0][int(required_workpiece_type[1]) - 1]
-        if available_pieces >= required_quantity:
-            stock[0][int(required_workpiece_type[1]) - 1] -= required_quantity
-            continue  # Skip ordering if enough pieces are already available in stock
-
-        # Find the best supplier based on the minimum order quantity
+    # Determine the supplier for each workpiece type based on the minimum order quantity
+    for workpiece_type, quantity in purchasing_plan.items():
         selected_supplier = None
         for supplier in suppliers:
             if (
-                    required_workpiece_type in supplier.workpiece_types
-                    and supplier.min_order <= required_quantity
-                    and (selected_supplier is None or supplier.min_order > selected_supplier.min_order)
+                workpiece_type in supplier.workpiece_types
+                and supplier.min_order <= quantity
+                and (selected_supplier is None or supplier.min_order > selected_supplier.min_order)
             ):
                 selected_supplier = supplier
-                print(required_quantity)
 
-        # Add the purchasing request to the purchasing plan for the corresponding workpiece type
+        # Add the supplier information to the purchasing plan
         if selected_supplier is not None:
-            purchasing_plan.setdefault(required_workpiece_type, {"Supplier": selected_supplier.name, "Quantity": 0})
-            purchasing_plan[required_workpiece_type]["Quantity"] += required_quantity
+            purchasing_plan[workpiece_type] = {
+                "Supplier": selected_supplier.name,
+                "Quantity": quantity
+            }
+        else:
+            # If no supplier is found, remove the workpiece type from the purchasing plan
+            del purchasing_plan[workpiece_type]
 
     return purchasing_plan
-
-
-
 
 
 day = database.get_day()
 stock = database.get_warehouse(None)
 mps = generate_mps(orders, suppliers,day)
 
-purchasing_plan = generate_purchasing_plan(mps, suppliers,stock)
+purchasing_plan = generate_purchasing_plan(orders, suppliers)
 print("mps:", mps)  # Add this line to print the entire mps list
 
 database.create_table("dailyplan")
@@ -205,16 +197,31 @@ order = orders  # Since there is only one order, assign it directly to the 'orde
 
 workpiece_type = order[3]  # Index 3 corresponds to the 'workpiece_type' in the tuple
 quantity = order[4]  # Index 4 corresponds to the 'quantity' in the tuple
-
-for supplier, purchasing_quantity in purchasing_plan.items():
-    if workpiece_type in purchasing_quantity:
-        # Add a daily plan entry for P1
-        if workpiece_type == "P1":
-            database.add_daily_plan(order[5], "P1", workpiece_type, purchasing_quantity[workpiece_type], 0)
-        # Add a daily plan entry for P2
-        elif workpiece_type == "P2":
-            database.add_daily_plan(order[5], "P2", workpiece_type, 0, purchasing_quantity[workpiece_type])
-        break
+for i in range(1):
+    for data in mps:
+        workpiece_typee = data["workpiece"]
+        quantity = data["quantity"]
+        order_id = data["order_id"]
+        date = data["completion_date"]
+        #print(workpiece_typee)
+        #print(quantity)
+        #print(order_id)
+        #print(date)
+        #database.add_daily_plan(day, f"{workpiece_typee} from P2","null",
+        #                        0, 8)
+        if workpiece_type in purchasing_plan:
+            print(workpiece_type)
+            # Add a daily plan entry for P1
+            if workpiece_type in ["P6", "P8"]:
+                database.add_daily_plan(date, f"orders_{order_id}", f"{workpiece_type} from P1",
+                                        purchasing_plan[workpiece_type], 0)
+                print(f"orders_{order_id}")
+                # Add a daily plan entry for P2
+            elif workpiece_type in ["P3", "P4", "P5", "P7", "P9"]:
+                database.add_daily_plan(date, f"orders_{order_id}", f"{workpiece_type} from P2",
+                                        purchasing_plan[workpiece_type], 0)
+                print(f"orders_{order_id}")
+    break
 
 # Print the values inside the mps dictionary
 for order in mps:
@@ -235,19 +242,19 @@ for supplier in suppliers:
 
 print("Purchasing Plan:")
 for workpiece_type, supplier_data in purchasing_plan.items():
-    print("Workpiece Type:", workpiece_type)
-    print("Supplier:", supplier_data['Supplier'])
-    print("Quantity:", supplier_data['Quantity'])
+     print("Workpiece Type:", workpiece_type)
+     print("Supplier:", supplier_data['Supplier'])
+     print("Quantity:", supplier_data['Quantity'])
 
 a = database.get_order_status('TBD')
-print(a)
-print(database.get_order_status('DONE'))
+#print(a)
+#print(database.get_order_status('DONE'))
 
-print(database.get_order_status('IN_PROGRESS'))
+#print(database.get_order_status('IN_PROGRESS'))
 
 database.update_order_status(906, 'DONE')
 
-print(database.get_order_status('DONE'))
+#print(database.get_order_status('DONE'))
 
 id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status = a[0]
-print(id_order)
+#print(id_order)
