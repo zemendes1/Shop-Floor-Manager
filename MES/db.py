@@ -419,5 +419,3 @@ def erase_facilities():
     query = "DELETE FROM facilities;"
     mycursor.execute(query)
     mydb.commit()
-
-erase_dailyplan()
