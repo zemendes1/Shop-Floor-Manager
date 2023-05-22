@@ -58,10 +58,21 @@ def generate_mps(orders, suppliers, day):
         "P9": 60
     }
 
+    # Initialize the latest completion date as the current day
+    latest_completion_date = day
+
+    # Keep track of processed order IDs
+    processed_order_ids = set()
+
     # Iterate over each order
     for order in orders:
         # Extract order information
         order_id = order[0]
+
+        # Skip the order if it has already been processed
+        if order_id in processed_order_ids:
+            continue
+
         workpiece = order[3]
         quantity = order[4]  # Extract the quantity from the order
 
@@ -94,7 +105,7 @@ def generate_mps(orders, suppliers, day):
 
         # Check if any start dates were recorded
         if not found_start_date:
-            earliest_start_date = 0
+            earliest_start_date = latest_completion_date  # Set the earliest start date to the latest completion date
         else:
             # Determine the earliest start date for this order based on the earliest start dates for its final products
             earliest_start_date = max(start_dates.values())
@@ -108,14 +119,16 @@ def generate_mps(orders, suppliers, day):
             # Distribute the quantity over the production days
             completion_date = earliest_start_date
             for _ in range(num_days):
-                completion_date += 1  # Increment the completion date by 1 day
-                completion_date += day  # Add the current value of day to the completion date
-                # Add the final product information to the master production schedule
+                completion_date += production_time  # Add the production time for the workpiece
 
-                completion_date += production_times[workpiece]  # Add the production time for the workpiece
+                # Update the latest completion date if the current completion date is greater
+                latest_completion_date = max(latest_completion_date, completion_date)
+
+                # Add the final product information to the master production schedule
                 mps.append({
                     "order_id": order_id,
                     "workpiece": workpiece,
+                    "final_product": final_product,
                     "start_date": earliest_start_date,
                     "completion_date": completion_date,
                     "quantity": quantity
@@ -123,17 +136,23 @@ def generate_mps(orders, suppliers, day):
 
             # Add the remaining quantity to the last production day
             if remaining_quantity > 0:
-                completion_date += 1
-                completion_date += day  # Add the current value of day to the completion date
+                completion_date += production_time * remaining_quantity  # Add the production time for the remaining quantity
 
-                completion_date += production_times[workpiece] * remaining_quantity  # Add the production time for the remaining quantity
+                # Update the latest completion date if the current completion date is greater
+                latest_completion_date = max(latest_completion_date, completion_date)
+
+                # Add the final product information to the master production schedule
                 mps.append({
                     "order_id": order_id,
                     "workpiece": workpiece,
+                    "final_product": final_product,
                     "start_date": earliest_start_date,
                     "completion_date": completion_date,
                     "quantity": remaining_quantity
                 })
+
+        # Add the processed order ID to the set
+        processed_order_ids.add(order_id)
 
     return mps
 
