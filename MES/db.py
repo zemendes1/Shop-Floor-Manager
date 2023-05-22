@@ -40,7 +40,7 @@ def create_table(_table):
     elif _table == "dailyplan":
         create_script = "CREATE TABLE IF NOT EXISTS dailyPlan (" \
                         "date INT CHECK (date >=0)," \
-                        "Purchase_orders varchar(40)," \
+                        "Working_orders varchar(40)," \
                         "Delivery_orders varchar(100), " \
                         "P1_toBuy INT CHECK (P1_toBuy >= 0)," \
                         "P2_toBuy INT CHECK (P2_toBuy >= 0)" \
@@ -176,7 +176,7 @@ def update_order_status(order, new_status):
     return 0
 
 
-def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
+def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
     # Check if entry with given date already exists
     mycursor.execute("SELECT * FROM dailyplan WHERE date = %s", (date,))
     existing_entry = mycursor.fetchone()
@@ -189,9 +189,9 @@ def add_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
     else:
         # If entry does not exist, add new plan to database
         new_plan = "INSERT INTO dailyplan" \
-                   " (date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy)" \
+                   " (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)" \
                    " VALUES (%s, %s, %s, %s, %s)"
-        values = (date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy)
+        values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
         mycursor.execute(new_plan, values)
         mydb.commit()
         # print("New entry added for facility number {}".format(date))
@@ -212,9 +212,9 @@ def get_daily_plan(date):
     return daily_plan_values
 
 
-def update_daily_plan(date, purchase_orders, delivery_orders, p1_tobuy, p2_tobuy):
-    update_plan = "UPDATE dailyplan SET purchase_orders = '{}', delivery_orders = '{}', p1_tobuy = {}, p2_tobuy = {}" \
-                  " WHERE date = '{}';".format(purchase_orders, delivery_orders, p1_tobuy, p2_tobuy, date)
+def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
+    update_plan = "UPDATE dailyplan SET working_orders = '{}', delivery_orders = '{}', p1_tobuy = {}, p2_tobuy = {}" \
+                  " WHERE date = '{}';".format(working_orders, delivery_orders, p1_tobuy, p2_tobuy, date)
     mycursor.execute(update_plan)
     mydb.commit()
     return 0
@@ -419,3 +419,5 @@ def erase_facilities():
     query = "DELETE FROM facilities;"
     mycursor.execute(query)
     mydb.commit()
+
+add_daily_plan(7, 'orders_1, orders_2', 'P3_from_P2, P3_from_P2, null, null', 75, 100)
