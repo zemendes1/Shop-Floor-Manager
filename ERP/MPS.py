@@ -39,19 +39,31 @@ suppliers = [
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
 
-orders = database.get_order(44)
-print (orders)
+orders = database.get_order_status('TBD')
+print(orders)
 
 
-def generate_mps(orders, suppliers):
+def generate_mps(orders, suppliers, day):
     # Initialize the master production schedule
-    mps = {}
+    mps = []
+
+    # Define the production times for each workpiece
+    production_times = {
+        "P3": 25,
+        "P4": 25,
+        "P5": 75,
+        "P6": 60,
+        "P7": 60,
+        "P8": 80,
+        "P9": 60
+    }
 
     # Iterate over each order
     for order in orders:
         # Extract order information
-        workpiece = orders[3]
-        quantity = orders[4]  # Extract the quantity from the order
+        order_id = order[0]
+        workpiece = order[3]
+        quantity = order[4]  # Extract the quantity from the order
 
         # Determine which final products can be made from the ordered workpiece
         if workpiece in ["P6", "P8"]:
@@ -73,7 +85,7 @@ def generate_mps(orders, suppliers):
                 if supplier.can_produce(workpiece):
                     can_produce_workpiece = True
                     # Calculate the earliest possible start date for this supplier
-                    earliest_start_date = max(orders[2] + supplier.delivery_time, supplier.available_date(final_product))
+                    earliest_start_date = max(order[2] + supplier.delivery_time, supplier.available_date(final_product))
 
                     # Update the start date for this final product if it is earlier than the current value
                     if final_product not in start_dates or earliest_start_date < start_dates[final_product]:
@@ -87,25 +99,53 @@ def generate_mps(orders, suppliers):
             # Determine the earliest start date for this order based on the earliest start dates for its final products
             earliest_start_date = max(start_dates.values())
 
-        # Calculate the scheduled completion date for each final product
+        # Calculate the scheduled completion date and quantity for each final product
         for final_product in final_products:
-            completion_date = earliest_start_date + suppliers[0].production_time(final_product)
-            # Add/update the final product in the master production schedule
-            if final_product not in mps:
-                mps[final_product] = {"quantity": quantity, "completion_date": completion_date}
-            else:
-                # Update the quantity and completion date if needed
-                mps[final_product]["quantity"] = max(quantity, mps[final_product]["quantity"])
-                mps[final_product]["completion_date"] = max(completion_date, mps[final_product]["completion_date"])
+            production_time = suppliers[0].production_time(final_product)
+            num_days = quantity // 4  # Calculate the number of full production days
+            remaining_quantity = quantity % 4  # Calculate the remaining quantity after full production days
+
+            # Distribute the quantity over the production days
+            completion_date = earliest_start_date
+            for _ in range(num_days):
+                completion_date += 1  # Increment the completion date by 1 day
+                completion_date += day  # Add the current value of day to the completion date
+                # Add the final product information to the master production schedule
+
+                completion_date += production_times[workpiece]  # Add the production time for the workpiece
+                mps.append({
+                    "order_id": order_id,
+                    "workpiece": workpiece,
+                    "start_date": earliest_start_date,
+                    "completion_date": completion_date,
+                    "quantity": quantity
+                })
+
+            # Add the remaining quantity to the last production day
+            if remaining_quantity > 0:
+                completion_date += 1
+                completion_date += day  # Add the current value of day to the completion date
+
+                completion_date += production_times[workpiece] * remaining_quantity  # Add the production time for the remaining quantity
+                mps.append({
+                    "order_id": order_id,
+                    "workpiece": workpiece,
+                    "start_date": earliest_start_date,
+                    "completion_date": completion_date,
+                    "quantity": remaining_quantity
+                })
 
     return mps
 
 
-def generate_purchasing_plan(mps, suppliers):
+def generate_purchasing_plan(mps, suppliers, stock):
     purchasing_plan = {}
 
-    for workpiece_type, data in mps.items():
-        quantity = data["quantity"]  # Access the quantity from the data dictionary
+    for data in mps:
+        workpiece_type = data["workpiece"]
+        quantity = data["quantity"]
+        print("workpiece_type:", workpiece_type)
+        print("quantity:", quantity)
 
         # Determine the appropriate workpiece type to order based on the given workpiece type
         if workpiece_type in ["P6", "P8"]:
@@ -113,30 +153,51 @@ def generate_purchasing_plan(mps, suppliers):
         else:
             required_workpiece_type = "P2"
 
-        required_quantity = max(quantity, 4)  # Set the required quantity to at least 4
+        print("required_workpiece_type:", required_workpiece_type)
 
-        # Find the best supplier based on the required quantity
+        # Find the orders for the required workpiece type
+        relevant_orders = [order_data for order_data in mps if order_data["workpiece"] == required_workpiece_type]
+        print("relevant_orders:", relevant_orders)
+
+        # Calculate the required quantity by summing the quantities of relevant orders
+        required_quantity = sum(order_data["quantity"] for order_data in relevant_orders) if relevant_orders else 0
+        print("required_quantity:", required_quantity)
+        required_quantity = max(required_quantity, 4)  # Set the required quantity to at least 4
+
+        # Check if the required workpiece type is already available in stock
+        available_pieces = stock[0][int(required_workpiece_type[1]) - 1]
+        if available_pieces >= required_quantity:
+            stock[0][int(required_workpiece_type[1]) - 1] -= required_quantity
+            continue  # Skip ordering if enough pieces are already available in stock
+
+        # Find the best supplier based on the minimum order quantity
         selected_supplier = None
         for supplier in suppliers:
             if (
-                required_workpiece_type in supplier.workpiece_types
-                and supplier.min_order <= required_quantity
-                and (selected_supplier is None or supplier.min_order > selected_supplier.min_order)
+                    required_workpiece_type in supplier.workpiece_types
+                    and supplier.min_order <= required_quantity
+                    and (selected_supplier is None or supplier.min_order > selected_supplier.min_order)
             ):
                 selected_supplier = supplier
+                print(required_quantity)
 
-        # Order the required quantity from the selected supplier
+        # Add the purchasing request to the purchasing plan for the corresponding workpiece type
         if selected_supplier is not None:
-            purchasing_plan.setdefault(workpiece_type, {})
-            purchasing_plan[workpiece_type]['Supplier'] = selected_supplier.name
-            purchasing_plan[workpiece_type]['Quantity'] = required_quantity
+            purchasing_plan.setdefault(required_workpiece_type, {"Supplier": selected_supplier.name, "Quantity": 0})
+            purchasing_plan[required_workpiece_type]["Quantity"] += required_quantity
 
     return purchasing_plan
 
 
-mps = generate_mps(orders, suppliers)
-purchasing_plan = generate_purchasing_plan(mps, suppliers)
 
+
+
+day = database.get_day()
+stock = database.get_warehouse(None)
+mps = generate_mps(orders, suppliers,day)
+
+purchasing_plan = generate_purchasing_plan(mps, suppliers,stock)
+print("mps:", mps)  # Add this line to print the entire mps list
 
 database.create_table("dailyplan")
 
@@ -155,29 +216,38 @@ for supplier, purchasing_quantity in purchasing_plan.items():
             database.add_daily_plan(order[5], "P2", workpiece_type, 0, purchasing_quantity[workpiece_type])
         break
 
-print(order[2], order[3], order[4], order[5], order[6], order[7])
+# Print the values inside the mps dictionary
+for order in mps:
+    order_id = order["order_id"]
+    workpiece = order["workpiece"]
+    start_date = order["start_date"]
+    completion_date = order["completion_date"]
+    quantity = order["quantity"]
 
-# Display the orders, suppliers, MPS, production plan, and purchasing plan
-print("Orders:")
-print(order[2], order[3], order[4], order[5], order[6], order[7])
+    print(f"Order ID: {order_id}")
+    print(
+        f"Workpiece: {workpiece} | Start Date: {start_date} | Completion Date: {completion_date} | Quantity: {quantity}")
+    print("------------------")
 
 print("Suppliers:")
 for supplier in suppliers:
     print(supplier.name, supplier.workpiece_types, supplier.min_order, supplier.price_per_piece, supplier.delivery_time)
-
-print("MPS:")
-for item, item_data in mps.items():
-    print("Item:", item)
-    if isinstance(item_data, int):
-        print("Quantity:", item_data)
-    else:
-        print("  Supplier:", item_data.get("Supplier"))
-        print("    Quantity:", item_data.get("quantity"))
-        print("    Completion Date:", item_data.get("completion_date"))
-
 
 print("Purchasing Plan:")
 for workpiece_type, supplier_data in purchasing_plan.items():
     print("Workpiece Type:", workpiece_type)
     print("Supplier:", supplier_data['Supplier'])
     print("Quantity:", supplier_data['Quantity'])
+
+a = database.get_order_status('TBD')
+print(a)
+print(database.get_order_status('DONE'))
+
+print(database.get_order_status('IN_PROGRESS'))
+
+database.update_order_status(906, 'DONE')
+
+print(database.get_order_status('DONE'))
+
+id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status = a[0]
+print(id_order)
