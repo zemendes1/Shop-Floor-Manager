@@ -146,7 +146,7 @@ def update_order(id_order, client, ordernumber, workpiece, quantity, duedate, la
 
 def get_order(id_order):
     if id_order is None:
-        query = "SELECT * FROM orders ORDER BY id DESC"
+        query = "SELECT * FROM orders order by DueDate"
         mycursor.execute(query)
         order_values = mycursor.fetchall()
         mydb.commit()
@@ -395,3 +395,29 @@ def get_warehouse(text):
         return warehouse_values
     else:
         return 'Error'
+
+
+def erase_docks():
+    query = "DELETE FROM docks;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def erase_orders():
+    query = "DELETE FROM orders;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def erase_dailyplan():
+    query = "DELETE FROM dailyplan;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def erase_facilities():
+    query = "DELETE FROM facilities;"
+    mycursor.execute(query)
+    mydb.commit()
+
+erase_dailyplan()
