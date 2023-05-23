@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_2.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Date"))
         item = self.tableWidget_2.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Purchase_orders"))
+        item.setText(_translate("MainWindow", "Working_orders"))
         item = self.tableWidget_2.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Delivery_orders"))
         item = self.tableWidget_2.horizontalHeaderItem(3)
@@ -319,7 +319,7 @@ class Ui_MainWindow(object):
         self.tableWidget_2.setRowCount(len(testeDailyPlan))
         for DailyPlan in testeDailyPlan:
             self.tableWidget_2.setItem(rowDailyPlan, 0, QtWidgets.QTableWidgetItem(DailyPlan["date"]))
-            self.tableWidget_2.setItem(rowDailyPlan, 1, QtWidgets.QTableWidgetItem(DailyPlan["Purchase_orders"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 1, QtWidgets.QTableWidgetItem(DailyPlan["Working_orders"]))
             self.tableWidget_2.setItem(rowDailyPlan, 2, QtWidgets.QTableWidgetItem(DailyPlan["Delivery_orders"]))
             self.tableWidget_2.setItem(rowDailyPlan, 3, QtWidgets.QTableWidgetItem(DailyPlan["P1_toBuy"]))
             self.tableWidget_2.setItem(rowDailyPlan, 4, QtWidgets.QTableWidgetItem(DailyPlan["P2_toBuy"]))
@@ -393,7 +393,7 @@ class Ui_MainWindow(object):
 
         for DailyPlan in testeDailyPlan:
             self.tableWidget_2.setItem(rowDailyPlan, 0, QtWidgets.QTableWidgetItem(DailyPlan["date"]))
-            self.tableWidget_2.setItem(rowDailyPlan, 1, QtWidgets.QTableWidgetItem(DailyPlan["Purchase_orders"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 1, QtWidgets.QTableWidgetItem(DailyPlan["Working_orders"]))
             self.tableWidget_2.setItem(rowDailyPlan, 2, QtWidgets.QTableWidgetItem(DailyPlan["Delivery_orders"]))
             self.tableWidget_2.setItem(rowDailyPlan, 3, QtWidgets.QTableWidgetItem(DailyPlan["P1_toBuy"]))
             self.tableWidget_2.setItem(rowDailyPlan, 4, QtWidgets.QTableWidgetItem(DailyPlan["P2_toBuy"]))

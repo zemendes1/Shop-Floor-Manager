@@ -104,7 +104,7 @@ def convert_string_daily_plan(input_str):
     values = list(input_str)
     result = {
         "date": str(values[0]),
-        "Purchase_orders": str(values[1]),
+        "Working_orders": str(values[1]),
         "Delivery_orders": str(values[2]),
         "P1_toBuy": str(values[3]),
         "P2_toBuy": str(values[4])
