@@ -461,7 +461,7 @@ def get_warehouse(text):
         mydb.commit()
         return warehouse_values[0]
     else:
-        query = "SELECT {} FROM warehouse ".format('p' + str(text))
+        query = "SELECT {} FROM warehouse ".format(str(text))
         mycursor.execute(query)
         warehouse_values = mycursor.fetchone()
         mydb.commit()
