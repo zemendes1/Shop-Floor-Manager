@@ -457,7 +457,7 @@ def insert_or_update_time(elapsed_time):
         # Define the number of milliseconds in a day
         MILLISECONDS_PER_DAY = 60 * 1000
         # Calculate the number of days
-        current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY)
+        current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
 
         if existing_row:
             # update existing row with new day and time_elapsed values
@@ -593,3 +593,4 @@ def erase_facilities():
     except psycopg2.Error:
         # Handle the database error
         print("Error erase_facilities")
+

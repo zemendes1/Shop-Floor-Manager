@@ -11,17 +11,18 @@ def execute_interface():
 
 def execute_everything_else(begin_time):
     while True:
-        opcua.run_opcua()
-
         # Get actual time
         now_time = time.time() * 1000.0
         elapsed_time = now_time - begin_time
         db.insert_or_update_time(elapsed_time)
 
+        opcua.run_opcua()
+
 
 if __name__ == '__main__':
     start_time = time.time() * 1000.0
     db.create_table("orders")
+    db.create_table("order_status")
     db.create_table("dailyplan")
     db.create_table("facilities")
     db.create_table("docks")

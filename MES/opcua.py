@@ -4,6 +4,7 @@ from asyncua import ua
 import db
 import PieceTransformer as Piece
 import Transformer_to_Piece as Transformer
+from MES import dock_transformer
 
 url = "opc.tcp://127.0.0.1:4840/"
 
@@ -12,17 +13,26 @@ Write_bool_value = False
 # Get daily Plan
 daily_plan = db.get_daily_plan(db.get_day())
 if daily_plan is not None:
-    get_date, get_purchase_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy = daily_plan
-    order1, order2, order3, order4 = get_delivery_orders.split(', ')
+    get_date, get_working_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy = daily_plan
+
+    order1, order2, order3, order4 = get_working_orders.split(', ')
     order1 = Piece.define_vector(order1)
     order2 = Piece.define_vector(order2)
     order3 = Piece.define_vector(order3)
     order4 = Piece.define_vector(order4)
+
+    delivery1, delivery2, delivery3, delivery4, delivery5, delivery6, delivery7, delivery8 = get_delivery_orders.split(', ')
+    delivery1 = dock_transformer.define_dock(delivery1)
+    delivery2 = dock_transformer.define_dock(delivery2)
+    delivery3 = dock_transformer.define_dock(delivery3)
+    delivery4 = dock_transformer.define_dock(delivery4)
+    delivery5 = dock_transformer.define_dock(delivery5)
+    delivery6 = dock_transformer.define_dock(delivery6)
+    delivery7 = dock_transformer.define_dock(delivery7)
+    delivery8 = dock_transformer.define_dock(delivery8)
 else:
-    order1 = 0
-    order2 = 0
-    order3 = 0
-    order4 = 0
+    order1, order2, order3, order4 = 0, 0, 0, 0
+    delivery1, delivery2, delivery3, delivery4, delivery5, delivery6, delivery7, delivery8 = 0, 0, 0, 0, 0, 0, 0, 0
 
 
 async def main():
@@ -33,7 +43,7 @@ async def main():
 
     async with Client(url=url) as client:
         if order1 != 0:
-            # Write Order #1 of the day
+            # Write Working Order #1 of the day
             for i in range(1, 6):
                 for j in range(1, 3):
                     node = client.get_node(
@@ -41,7 +51,7 @@ async def main():
                     await node.write_value(ua.Variant(order1[i - 1][j - 1], ua.VariantType.Int16))
 
         if order2 != 0:
-            # Write Order #2 of the day
+            # Write Working Order #2 of the day
             for i in range(1, 6):
                 for j in range(1, 3):
                     node = client.get_node(
@@ -49,7 +59,7 @@ async def main():
                     await node.write_value(ua.Variant(order2[i - 1][j - 1], ua.VariantType.Int16))
 
         if order3 != 0:
-            # Write Order #3 of the day
+            # Write Working Order #3 of the day
             for i in range(1, 6):
                 for j in range(1, 3):
                     node = client.get_node(
@@ -57,7 +67,7 @@ async def main():
                     await node.write_value(ua.Variant(order3[i - 1][j - 1], ua.VariantType.Int16))
 
         if order4 != 0:
-            # Write Order #4 of the day
+            # Write Working Order #4 of the day
             for i in range(1, 6):
                 for j in range(1, 3):
                     node = client.get_node(
