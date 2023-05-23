@@ -461,7 +461,7 @@ def get_warehouse(text):
         mydb.commit()
         return warehouse_values[0]
     else:
-        query = "SELECT {} FROM warehouse ".format('p' + str(text))
+        query = "SELECT {} FROM warehouse ".format(str(text))
         mycursor.execute(query)
         warehouse_values = mycursor.fetchone()
         mydb.commit()
@@ -520,3 +520,73 @@ def erase_warehouse():
     query = "DELETE FROM warehouse;"
     mycursor.execute(query)
     mydb.commit()
+
+
+def remove_piece_from_warehouse(piece_type, number_of_pieces):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    if piece_type is not None:
+        query = "SELECT * FROM warehouse"
+        mycursor.execute(query)
+        warehouse_values = mycursor.fetchall()
+        mydb.commit()
+        p1, p2, p3, p4, p5, p6, p7, p8, p9 = warehouse_values[0]
+
+        update_query = "DELETE FROM warehouse"
+        mycursor.execute(update_query)
+        mydb.commit()
+
+        if "p" + piece_type[1] == "p1":
+            add_warehouse(p1 - number_of_pieces, p2, p3, p4, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p2":
+            add_warehouse(p1, p2 - number_of_pieces, p3, p4, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p3":
+            add_warehouse(p1, p2, p3 - number_of_pieces, p4, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p4":
+            add_warehouse(p1, p2, p3, p4 - number_of_pieces, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p5":
+            add_warehouse(p1, p2, p3, p4, p5 - number_of_pieces, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p6":
+            add_warehouse(p1, p2, p3, p4, p5, p6 - number_of_pieces, p7, p8, p9)
+        elif "p" + piece_type[1] == "p7":
+            add_warehouse(p1, p2, p3, p4, p5, p6, p7 - number_of_pieces, p8, p9)
+        elif "p" + piece_type[1] == "p8":
+            add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8 - number_of_pieces, p9)
+        elif "p" + piece_type[1] == "p9":
+            add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9 - number_of_pieces)
+
+
+def add_piece_to_warehouse(piece_type, number_of_pieces):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    if piece_type is not None:
+        query = "SELECT * FROM warehouse"
+        mycursor.execute(query)
+        warehouse_values = mycursor.fetchall()
+        mydb.commit()
+        p1, p2, p3, p4, p5, p6, p7, p8, p9 = warehouse_values[0]
+
+        update_query = "DELETE FROM warehouse"
+        mycursor.execute(update_query)
+        mydb.commit()
+
+        if "p" + piece_type[1] == "p1":
+            add_warehouse(p1 + number_of_pieces, p2, p3, p4, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p2":
+            add_warehouse(p1, p2 + number_of_pieces, p3, p4, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p3":
+            add_warehouse(p1, p2, p3 + number_of_pieces, p4, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p4":
+            add_warehouse(p1, p2, p3, p4 + number_of_pieces, p5, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p5":
+            add_warehouse(p1, p2, p3, p4, p5 + number_of_pieces, p6, p7, p8, p9)
+        elif "p" + piece_type[1] == "p6":
+            add_warehouse(p1, p2, p3, p4, p5, p6 + number_of_pieces, p7, p8, p9)
+        elif "p" + piece_type[1] == "p7":
+            add_warehouse(p1, p2, p3, p4, p5, p6, p7 + number_of_pieces, p8, p9)
+        elif "p" + piece_type[1] == "p8":
+            add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8 + number_of_pieces, p9)
+        elif "p" + piece_type[1] == "p9":
+            add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9 + number_of_pieces)
