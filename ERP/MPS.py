@@ -1,5 +1,5 @@
 import MES.db as database
-
+import time
 
 class Order:
     def __init__(self, id, client, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty, path, status):
@@ -39,7 +39,9 @@ suppliers = [
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
 
-orders = database.get_order_status('TBD')
+non_ordered_orders = database.get_order_status('TBD')
+#print(non_ordered_orders)
+orders = sorted(non_ordered_orders, key=lambda x: x[5])
 #print(orders)
 
 
@@ -191,6 +193,124 @@ def generate_purchasing_plan(orders, suppliers):
 
     return purchasing_plan
 
+
+def process_working_orders(stock, orders, day):
+    # Define the transformation times for each workpiece
+    transformation_times = {
+        "P1": {"P6": 25},
+        "P2": {"P3": 25, "P4": 25},
+        "P3": {"P6": 35},
+        "P4": {"P7": 25},
+        "P6": {"P8": 60},
+        "P7": {"P9": 25},
+        "P9": {"P5": 30},
+    }
+
+    # Create an empty list to store the completed transformations
+    completed_transformations = []
+
+    # Iterate over the orders
+    for order in orders:
+        order_id = order[0]
+        due_date = order[1]
+        starting_workpiece = order[4]
+
+        # Check if the starting workpiece is in stock
+        if stock[0][starting_workpiece] > 0:
+            # Iterate over the transformations for the starting workpiece
+            for transformed_workpiece, time in transformation_times[starting_workpiece].items():
+                # Check if there are enough pieces in stock to perform the transformation
+                if stock[0][starting_workpiece] >= 1 and stock[0][transformed_workpiece] < 4:
+                    # Perform the transformation
+                    stock[0][starting_workpiece] -= 1
+                    stock[0][transformed_workpiece] += 1
+
+                    # Add the completed transformation to the list
+                    completed_transformations.append(f"{transformed_workpiece}_from_{starting_workpiece}")
+
+                    # Update the order status
+                    if stock[0][starting_workpiece] == 0:
+                        database.update_order_status(order_id, "DONE")
+                    else:
+                        database.update_order_status(order_id, "IN_PROGRESS")
+
+                    # Increment the day by the transformation time
+                    day += time
+
+                    # Check if the maximum number of transformations for the day has been reached
+                    if len(completed_transformations) >= 4:
+                        break
+
+        # Check if the maximum number of transformations for the day has been reached
+        if len(completed_transformations) >= 4:
+            break
+
+    # Add "null" to the completed transformations for any remaining positions
+    completed_transformations += ["null"] * (4 - len(completed_transformations))
+
+    return completed_transformations
+
+
+def process_completed_orders(orders, day):
+    completed_orders = []
+
+    # Get the orders with the same due date as the current day
+    due_orders = [order for order in orders if order[2] == day]
+    stock = database.get_warehouse(None)
+    # Check the stock for each due order
+    for order in due_orders:
+        order_id = order[0]
+        workpiece = order[3]
+        quantity = order[4]
+
+        # Check if the requested workpiece is in stock and in the correct quantity
+        if stock.get(workpiece, 0) >= quantity:
+            # Update the stock by deducting the processed quantity
+            stock[workpiece] -= quantity
+
+            # Determine the dock number based on the count of strings ending with the number 1
+            dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
+
+            # Create the tuple and append it to the completed orders list
+            completed_orders.append(f"{workpiece}_on_{dock_number}")
+
+    # Fill the remaining positions with "null" if there aren't enough pieces
+    remaining_positions = 8 - len(completed_orders)
+    completed_orders.extend(["null"] * remaining_positions)
+
+    return completed_orders
+
+
+def continuous_processing(suppliers):
+    while True:
+        # Get the current day from the database
+        day = database.get_day()
+        # Get a new batch of orders
+        non_ordered_orders = database.get_order_status('TBD')
+        # Sort orders by due date
+        orders = sorted(non_ordered_orders, key=lambda x: x[5])
+
+        # Generate the purchasing plan for the day
+        purchasing_plan = generate_purchasing_plan(orders, suppliers)
+
+        # Separate the quantities of P1 and P2 from the purchasing plan
+        p1_tobuy = purchasing_plan.get("P1", {}).get("Quantity", 0)
+        p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
+
+        # Generate the master production schedule for the day
+        working_orders = generate_mps(orders, suppliers, day)
+
+        # Process the completed orders and determine the delivery orders for the day
+        delivery_orders = process_completed_orders(stock, orders, day)
+
+        # Insert the daily plan into the database
+        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
+
+        # Wait for 60 seconds before processing the next day
+        print("UPDATED")
+        time.sleep(60)
+
+
 def calculo_de_custos(purchasing_plan):
     custofinal = 0
     for workpiece_type, supplier_data in purchasing_plan.items():
@@ -217,6 +337,8 @@ def calculo_de_custos(purchasing_plan):
                 custofinal = custofinal + quant * 18
 
     return custofinal
+
+
 def penalty_calc(mps, orders):
     matched_mps = []
     pen = 0
@@ -273,8 +395,6 @@ def penalty_calc(mps, orders):
 
     return pen
 
-
-
 day = database.get_day()
 stock = database.get_warehouse(None)
 mps = generate_mps(orders, suppliers,day)
@@ -282,6 +402,7 @@ purchasing_plan = generate_purchasing_plan(orders, suppliers)
 custo_final = calculo_de_custos(purchasing_plan)
 pen = penalty_calc(mps, orders)
 
+print(process_working_orders(stock, orders, day))
 print("mps:", mps)  # Add this line to print the entire mps list
 
 
@@ -358,3 +479,5 @@ database.update_order_status(906, 'DONE')
 
 id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status = a[0]
 #print(id_order)
+
+#continuous_processing(orders)
