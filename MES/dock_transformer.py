@@ -1,3 +1,5 @@
+# Peça a entregar -> Dock a entregar
+
 def define_dock(delivery):
     Vector = []
     # Categorias de transformação que a peça de origem tem de alcançar para se transformar na peça pedida

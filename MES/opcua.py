@@ -22,14 +22,14 @@ if daily_plan is not None:
     order4 = Piece.define_vector(order4)
 
     delivery1, delivery2, delivery3, delivery4, delivery5, delivery6, delivery7, delivery8 = get_delivery_orders.split(', ')
-    delivery1 = dock_transformer.define_dock(delivery1)
-    delivery2 = dock_transformer.define_dock(delivery2)
-    delivery3 = dock_transformer.define_dock(delivery3)
-    delivery4 = dock_transformer.define_dock(delivery4)
-    delivery5 = dock_transformer.define_dock(delivery5)
-    delivery6 = dock_transformer.define_dock(delivery6)
-    delivery7 = dock_transformer.define_dock(delivery7)
-    delivery8 = dock_transformer.define_dock(delivery8)
+    delivery[1] = dock_transformer.define_dock(delivery1)
+    delivery[2] = dock_transformer.define_dock(delivery2)
+    delivery[3] = dock_transformer.define_dock(delivery3)
+    delivery[4] = dock_transformer.define_dock(delivery4)
+    delivery[5] = dock_transformer.define_dock(delivery5)
+    delivery[6] = dock_transformer.define_dock(delivery6)
+    delivery[7] = dock_transformer.define_dock(delivery7)
+    delivery[8] = dock_transformer.define_dock(delivery8)
 else:
     order1, order2, order3, order4 = 0, 0, 0, 0
     delivery1, delivery2, delivery3, delivery4, delivery5, delivery6, delivery7, delivery8 = 0, 0, 0, 0, 0, 0, 0, 0
@@ -44,35 +44,42 @@ async def main():
     async with Client(url=url) as client:
         if order1 != 0:
             # Write Working Order #1 of the day
-            for i in range(1, 6):
+            for i in range(1, 3):
                 for j in range(1, 3):
                     node = client.get_node(
-                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE1[{}][{}]".format(i, j))
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao1[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order1[i - 1][j - 1], ua.VariantType.Int16))
 
         if order2 != 0:
             # Write Working Order #2 of the day
-            for i in range(1, 6):
+            for i in range(1, 3):
                 for j in range(1, 3):
                     node = client.get_node(
-                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE2[{}][{}]".format(i, j))
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao2[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order2[i - 1][j - 1], ua.VariantType.Int16))
 
         if order3 != 0:
             # Write Working Order #3 of the day
-            for i in range(1, 6):
+            for i in range(1, 3):
                 for j in range(1, 3):
                     node = client.get_node(
-                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE3[{}][{}]".format(i, j))
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao3[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order3[i - 1][j - 1], ua.VariantType.Int16))
 
         if order4 != 0:
             # Write Working Order #4 of the day
-            for i in range(1, 6):
+            for i in range(1, 3):
                 for j in range(1, 3):
                     node = client.get_node(
-                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.MES_TESTE4[{}][{}]".format(i, j))
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao4[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order4[i - 1][j - 1], ua.VariantType.Int16))
+
+        if delivery1 != 0:
+            # Write Deliveries of the day
+            for j in range(1, 9):
+                node = client.get_node(
+                    "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[{}]".format(i))
+                await node.write_value(ua.Variant(delivery[i], ua.VariantType.Int16))
 
         # Ler Tempo de Funcionamento de cada máquina
         for i in range(1, 5):
