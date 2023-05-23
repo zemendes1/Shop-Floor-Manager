@@ -21,7 +21,8 @@ def connect_to_database():
 
 
 def create_table(_table):
-
+    connect_to_database()
+    mycursor = mydb.cursor()
     # CREATE TABLE
     create_script = ""
     if _table == "orders":
@@ -114,46 +115,37 @@ def create_table(_table):
                         " duedate, late_penalty, early_penalty, path, status " \
                         "FROM orders WHERE status = 'IN_PROGRESS';"
 
-    connect_to_database()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            mycursor.execute(create_script)
-            mydb.commit()
-        else:
-            print("Not Connected to database create_table")
+        mycursor.execute(create_script)
+        mydb.commit()
 
     except psycopg2.Error as e:
         # Handle the database error
-        print("Error create_table {}: {}".format(_table, e))
+        print("Error creating table {}: {}".format(_table, e))
 
 
 def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
+        # Check if entry with given id_order already exists
+        mycursor.execute("SELECT * FROM orders WHERE id = %s", (id_order,))
+        existing_entry = mycursor.fetchone()
 
-            mycursor = mydb.cursor()
-            # Check if entry with given id_order already exists
-            mycursor.execute("SELECT * FROM orders WHERE id = %s", (id_order,))
-            existing_entry = mycursor.fetchone()
+        # If entry exists, do not add new order and return -1
+        if existing_entry:
+            return 1
 
-            # If entry exists, do not add new order and return -1
-            if existing_entry:
-                return 1
-
-            # If entry does not exist, add new order to database
-            new_order = "INSERT INTO orders" \
-                        " (id, client, ordernumber, workpiece, quantity, duedate," \
-                        " late_penalty, early_penalty, path, status)" \
-                        " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            values = (id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty,
-                      path, status)
-            mycursor.execute(new_order, values)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database add_order")
+        # If entry does not exist, add new order to database
+        new_order = "INSERT INTO orders" \
+                    " (id, client, ordernumber, workpiece, quantity, duedate," \
+                    " late_penalty, early_penalty, path, status)" \
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        values = (id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty,
+                  path, status)
+        mycursor.execute(new_order, values)
+        mydb.commit()
+        return 0
     except psycopg2.Error:
         # Handle the database error
         print("Error add_order")
@@ -162,21 +154,17 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_
 def update_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path,
                  status):
     connect_to_database()
-
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            new_order = "UPDATE orders SET " \
-                        "client='{}', ordernumber={}, workpiece='{}', quantity={}, duedate={}, late_penalty={}," \
-                        " early_penalty={}, path='{}', status='{}'" \
-                        " WHERE id={}".format(client, ordernumber, workpiece, quantity, duedate, late_penalty,
-                                              early_penalty,
-                                              path, status, id_order)
-            mycursor.execute(new_order)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database update_order")
+        new_order = "UPDATE orders SET " \
+                    "client='{}', ordernumber={}, workpiece='{}', quantity={}, duedate={}, late_penalty={}," \
+                    " early_penalty={}, path='{}', status='{}'" \
+                    " WHERE id={}".format(client, ordernumber, workpiece, quantity, duedate, late_penalty,
+                                          early_penalty,
+                                          path, status, id_order)
+        mycursor.execute(new_order)
+        mydb.commit()
+        return 0
     except psycopg2.Error:
         # Handle the database error
         print("Error update_order")
@@ -184,22 +172,19 @@ def update_order(id_order, client, ordernumber, workpiece, quantity, duedate, la
 
 def get_order(id_order):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            if id_order is None:
-                query = "SELECT * FROM orders order by DueDate"
-                mycursor.execute(query)
-                order_values = mycursor.fetchall()
-                mydb.commit()
-            else:
-                query = "SELECT * FROM orders WHERE id= {}".format(id_order)
-                mycursor.execute(query)
-                order_values = mycursor.fetchone()
-                mydb.commit()
-            return order_values
+        if id_order is None:
+            query = "SELECT * FROM orders order by DueDate"
+            mycursor.execute(query)
+            order_values = mycursor.fetchall()
+            mydb.commit()
         else:
-            print("Not Connected to database get_order")
+            query = "SELECT * FROM orders WHERE id= {}".format(id_order)
+            mycursor.execute(query)
+            order_values = mycursor.fetchone()
+            mydb.commit()
+        return order_values
     except psycopg2.Error:
         # Handle the database error
         print("Error get_order")
@@ -207,20 +192,16 @@ def get_order(id_order):
 
 def get_order_status(status_of_order):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-
-            mycursor = mydb.cursor()
-            if status_of_order in ('TBD', 'DONE', 'IN_PROGRESS'):
-                query = "SELECT * FROM orders WHERE status = %s ORDER BY id DESC"
-                mycursor.execute(query, (status_of_order,))
-                order_values = mycursor.fetchall()
-                mydb.commit()
-                return order_values
-            else:
-                return 'ERROR'
+        if status_of_order in ('TBD', 'DONE', 'IN_PROGRESS'):
+            query = "SELECT * FROM orders WHERE status = %s ORDER BY id DESC"
+            mycursor.execute(query, (status_of_order,))
+            order_values = mycursor.fetchall()
+            mydb.commit()
+            return order_values
         else:
-            print("Not Connected to database get_order_status")
+            return 'ERROR'
     except psycopg2.Error:
         # Handle the database error
         print("Error get_order_status")
@@ -228,16 +209,12 @@ def get_order_status(status_of_order):
 
 def update_order_status(order, new_status):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-
-            mycursor = mydb.cursor()
-            query = "UPDATE orders SET status = '{}' WHERE id = '{}';".format(new_status, order)
-            mycursor.execute(query)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database update_order_status")
+        query = "UPDATE orders SET status = '{}' WHERE id = '{}';".format(new_status, order)
+        mycursor.execute(query)
+        mydb.commit()
+        return 0
     except psycopg2.Error:
         # Handle the database error
         print("Error update_order_status")
@@ -245,28 +222,25 @@ def update_order_status(order, new_status):
 
 def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            # Check if entry with given date already exists
-            mycursor.execute("SELECT * FROM dailyplan WHERE date = %s", (date,))
-            existing_entry = mycursor.fetchone()
+        # Check if entry with given date already exists
+        mycursor.execute("SELECT * FROM dailyplan WHERE date = %s", (date,))
+        existing_entry = mycursor.fetchone()
 
-            # If entry exists, do not add new plan and return -1
-            if existing_entry:
-                return 1
+        # If entry exists, do not add new plan and return -1
+        if existing_entry:
+            return 1
 
-            else:
-                # If entry does not exist, add new plan to database
-                new_plan = "INSERT INTO dailyplan" \
-                           " (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)" \
-                           " VALUES (%s, %s, %s, %s, %s)"
-                values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
-                mycursor.execute(new_plan, values)
-                mydb.commit()
-            return 0
         else:
-            print("Not Connected to database")
+            # If entry does not exist, add new plan to database
+            new_plan = "INSERT INTO dailyplan" \
+                       " (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)" \
+                       " VALUES (%s, %s, %s, %s, %s)"
+            values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
+            mycursor.execute(new_plan, values)
+            mydb.commit()
+        return 0
 
     except psycopg2.Error:
         # Handle the database error
@@ -275,22 +249,19 @@ def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
 
 def get_daily_plan(date):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            if date is None:
-                query = "SELECT * FROM dailyplan ORDER BY date DESC"
-                mycursor.execute(query)
-                daily_plan_values = mycursor.fetchall()
-                mydb.commit()
-            else:
-                query = "SELECT * FROM dailyplan WHERE date = '{}'".format(date)
-                mycursor.execute(query)
-                daily_plan_values = mycursor.fetchone()
-                mydb.commit()
-            return daily_plan_values
+        if date is None:
+            query = "SELECT * FROM dailyplan ORDER BY date DESC"
+            mycursor.execute(query)
+            daily_plan_values = mycursor.fetchall()
+            mydb.commit()
         else:
-            print("Not Connected to database")
+            query = "SELECT * FROM dailyplan WHERE date = '{}'".format(date)
+            mycursor.execute(query)
+            daily_plan_values = mycursor.fetchone()
+            mydb.commit()
+        return daily_plan_values
     except psycopg2.Error:
         # Handle the database error
         print("Error get_daily_plan")
@@ -298,17 +269,14 @@ def get_daily_plan(date):
 
 def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            update_plan = "UPDATE dailyplan SET working_orders = '{}', delivery_orders = '{}'" \
-                          ", p1_tobuy = {}, p2_tobuy = {}" \
-                          " WHERE date = '{}';".format(working_orders, delivery_orders, p1_tobuy, p2_tobuy, date)
-            mycursor.execute(update_plan)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database")
+        update_plan = "UPDATE dailyplan SET working_orders = '{}', delivery_orders = '{}'" \
+                      ", p1_tobuy = {}, p2_tobuy = {}" \
+                      " WHERE date = '{}';".format(working_orders, delivery_orders, p1_tobuy, p2_tobuy, date)
+        mycursor.execute(update_plan)
+        mydb.commit()
+        return 0
     except psycopg2.Error:
         # Handle the database error
         print("Error update_daily_plan")
@@ -316,31 +284,28 @@ def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
 
 def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            # Check if the entry exists
-            check_query = "SELECT EXISTS(SELECT 1 FROM facilities WHERE num = {} )".format(num)
-            mycursor.execute(check_query)
-            result = mycursor.fetchone()[0]
+        # Check if the entry exists
+        check_query = "SELECT EXISTS(SELECT 1 FROM facilities WHERE num = {} )".format(num)
+        mycursor.execute(check_query)
+        result = mycursor.fetchone()[0]
 
-            if result:
-                # The entry exists, so don't insert it again
-                return 1
-            else:
-                # The entry doesn't exist, so insert it
-                time = convert_ms_to_postgre_time(work_time)
-                new_facility = "INSERT INTO facilities" \
-                               " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9, worktime)" \
-                               " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}');".format(num, p1, p2, p3, p4, p5, p6,
-                                                                                                p7,
-                                                                                                p8, p9, time)
-                mycursor.execute(new_facility)
-                mydb.commit()
-
-            return 0
+        if result:
+            # The entry exists, so don't insert it again
+            return 1
         else:
-            print("Not Connected to database")
+            # The entry doesn't exist, so insert it
+            time = convert_ms_to_postgre_time(work_time)
+            new_facility = "INSERT INTO facilities" \
+                           " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9, worktime)" \
+                           " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}');".format(num, p1, p2, p3, p4, p5, p6,
+                                                                                            p7,
+                                                                                            p8, p9, time)
+            mycursor.execute(new_facility)
+            mydb.commit()
+
+        return 0
 
     except psycopg2.Error:
         # Handle the database error
@@ -349,17 +314,14 @@ def add_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
 
 def update_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            time = convert_ms_to_postgre_time(work_time)
-            update_query = "UPDATE facilities SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}," \
-                           "worktime='{}' WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, time, num)
-            mycursor.execute(update_query)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database")
+        time = convert_ms_to_postgre_time(work_time)
+        update_query = "UPDATE facilities SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}," \
+                       "worktime='{}' WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, time, num)
+        mycursor.execute(update_query)
+        mydb.commit()
+        return 0
 
     except psycopg2.Error:
         # Handle the database error
@@ -368,23 +330,20 @@ def update_facility(num, p1, p2, p3, p4, p5, p6, p7, p8, p9, work_time):
 
 def get_facility(num):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            if num is None:
-                query = "SELECT * FROM facilities order by num "
-                mycursor.execute(query)
-                facility_values = mycursor.fetchall()
-                mydb.commit()
+        if num is None:
+            query = "SELECT * FROM facilities order by num "
+            mycursor.execute(query)
+            facility_values = mycursor.fetchall()
+            mydb.commit()
 
-            else:
-                query = "SELECT * FROM facilities WHERE num = {}".format(num)
-                mycursor.execute(query)
-                facility_values = mycursor.fetchone()
-                mydb.commit()
-            return facility_values
         else:
-            print("Not Connected to database")
+            query = "SELECT * FROM facilities WHERE num = {}".format(num)
+            mycursor.execute(query)
+            facility_values = mycursor.fetchone()
+            mydb.commit()
+        return facility_values
 
     except psycopg2.Error:
         # Handle the database error
@@ -393,30 +352,28 @@ def get_facility(num):
 
 def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            # Check if the entry exists
-            check_query = "SELECT EXISTS(SELECT 1 FROM docks WHERE num = {})".format(num)
-            mycursor.execute(check_query)
-            result = mycursor.fetchone()[0]
+        # Check if the entry exists
+        check_query = "SELECT EXISTS(SELECT 1 FROM docks WHERE num = {})".format(num)
+        mycursor.execute(check_query)
+        result = mycursor.fetchone()[0]
 
-            if result:
-                # The entry exists, so don't insert it again
-                return 1
+        if result:
+            # The entry exists, so don't insert it again
+            return 1
 
-            else:
-                # The entry doesn't exist, so insert it
-                new_dock = "INSERT INTO docks" \
-                           " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
-                           " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8,
-                                                                                      p9)
-                mycursor.execute(new_dock)
-                mydb.commit()
-
-            return 0
         else:
-            print("Not Connected to database")
+            # The entry doesn't exist, so insert it
+            new_dock = "INSERT INTO docks" \
+                       " (num, p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
+                       " VALUES ({}, {}, {}, {}, {}, {}, {}, {}, {}, {});".format(num, p1, p2, p3, p4, p5, p6, p7, p8,
+                                                                                  p9)
+            mycursor.execute(new_dock)
+            mydb.commit()
+
+        return 0
+
     except psycopg2.Error:
         # Handle the database error
         print("Error add_dock")
@@ -424,16 +381,14 @@ def add_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 def update_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            update_query = "UPDATE docks SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={} " \
-                           "WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, num)
-            mycursor.execute(update_query)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database")
+        update_query = "UPDATE docks SET p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={} " \
+                       "WHERE num={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9, num)
+        mycursor.execute(update_query)
+        mydb.commit()
+        return 0
+
     except psycopg2.Error:
         # Handle the database error
         print("Error update_dock")
@@ -441,23 +396,20 @@ def update_dock(num, p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 def get_dock(num):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-
-            if num is None:
-                query = "SELECT * FROM docks order by num"
-                mycursor.execute(query)
-                dock_values = mycursor.fetchall()
-                mydb.commit()
-            else:
-                query = "SELECT * FROM docks WHERE num = {}".format(num)
-                mycursor.execute(query)
-                dock_values = mycursor.fetchone()
-                mydb.commit()
-            return dock_values
+        if num is None:
+            query = "SELECT * FROM docks order by num"
+            mycursor.execute(query)
+            dock_values = mycursor.fetchall()
+            mydb.commit()
         else:
-            print("Not Connected to database")
+            query = "SELECT * FROM docks WHERE num = {}".format(num)
+            mycursor.execute(query)
+            dock_values = mycursor.fetchone()
+            mydb.commit()
+        return dock_values
+
     except psycopg2.Error:
         # Handle the database error
         print("Error get_dock")
@@ -465,23 +417,20 @@ def get_dock(num):
 
 def reset_db():
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            query = "DELETE FROM docks; DELETE FROM facilities; DELETE FROM orders; DELETE FROM dailyplan;" \
-                    "DELETE FROM order_status; DELETE FROM day; DELETE FROM warehouse;"
-            mycursor.execute(query)
-            mydb.commit()
+        query = "DELETE FROM docks; DELETE FROM facilities; DELETE FROM orders; DELETE FROM dailyplan;" \
+                "DELETE FROM order_status; DELETE FROM day; DELETE FROM warehouse;"
+        mycursor.execute(query)
+        mydb.commit()
 
-            add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            add_facility(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            add_facility(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        add_facility(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        add_facility(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-            add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-            add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        else:
-            print("Not Connected to database")
+        add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     except psycopg2.Error:
         # Handle the database error
@@ -499,52 +448,46 @@ def convert_ms_to_postgre_time(ms):
 
 def insert_or_update_time(elapsed_time):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            # check if row already exists for this day
-            mycursor.execute("SELECT * FROM day")
-            existing_row = mycursor.fetchone()
+        # check if row already exists for this day
+        mycursor.execute("SELECT * FROM day")
+        existing_row = mycursor.fetchone()
 
-            # Define the number of milliseconds in a day
-            MILLISECONDS_PER_DAY = 60 * 1000
-            # Calculate the number of days
-            current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
+        # Define the number of milliseconds in a day
+        MILLISECONDS_PER_DAY = 60 * 1000
+        # Calculate the number of days
+        current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
 
-            if existing_row:
-                # update existing row with new day and time_elapsed values
-                mycursor.execute(
-                    "UPDATE day SET day={}, time_elapsed='{}'".format(current_day,
-                                                                      convert_ms_to_postgre_time(elapsed_time)))
-                mydb.commit()
-            else:
-                # insert new row with day and time_elapsed values
-                mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES ({}, '{}')".format(current_day,
-                                                                                                convert_ms_to_postgre_time(
-                                                                                                    elapsed_time)))
-                mydb.commit()
+        if existing_row:
+            # update existing row with new day and time_elapsed values
+            mycursor.execute(
+                "UPDATE day SET day={}, time_elapsed='{}'".format(current_day,
+                                                                  convert_ms_to_postgre_time(elapsed_time)))
+            mydb.commit()
         else:
-            print("Not Connected to database")
+            # insert new row with day and time_elapsed values
+            mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES ({}, '{}')".format(current_day,
+                                                                                            convert_ms_to_postgre_time(
+                                                                                                elapsed_time)))
+            mydb.commit()
+
     except psycopg2.Error:
         # Handle the database error
-        print("Error insert_or_update_time {}".format(psycopg2.Error))
+        print("Error insert_or_update_time")
 
 
 def get_day():
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
         query = "SELECT day FROM day"
-
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            mycursor.execute(query)
-            dia = mycursor.fetchall()
-            if dia is not None:
-                return dia[0][0]
-            else:
-                return 0
+        mycursor.execute(query)
+        dia = mycursor.fetchall()
+        if dia is not None:
+            return dia[0][0]
         else:
-            print("Not Connected to database")
+            return 0
 
     except psycopg2.Error:
         # Handle the database error
@@ -553,17 +496,14 @@ def get_day():
 
 def add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            new_warehouse = "INSERT INTO warehouse" \
-                            " (p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
-                            " VALUES ( {}, {}, {}, {}, {}, {}, {}, {}, {});".format(p1, p2, p3, p4, p5, p6, p7, p8, p9)
-            mycursor.execute(new_warehouse)
-            mydb.commit()
-            return 0
-        else:
-            print("Not Connected to database")
+        new_warehouse = "INSERT INTO warehouse" \
+                        " (p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
+                        " VALUES ( {}, {}, {}, {}, {}, {}, {}, {}, {});".format(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+        mycursor.execute(new_warehouse)
+        mydb.commit()
+        return 0
 
     except psycopg2.Error:
         # Handle the database error
@@ -572,18 +512,13 @@ def add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 def update_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-
-        if mydb is not None:
-
-            mycursor = mydb.cursor()
-            update_query = "DELETE FROM warehouse"
-            mycursor.execute(update_query)
-            mydb.commit()
-            add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9)
-            return 0
-        else:
-            print("Not Connected to database")
+        update_query = "DELETE FROM warehouse"
+        mycursor.execute(update_query)
+        mydb.commit()
+        add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+        return 0
 
     except psycopg2.Error:
         # Handle the database error
@@ -592,20 +527,17 @@ def update_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
 
 def get_warehouse(text):
     connect_to_database()
-
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            if text is None:
-                query = "SELECT * FROM warehouse"
-                mycursor.execute(query)
-                warehouse_values = mycursor.fetchall()
-                mydb.commit()
-                return warehouse_values
-            else:
-                return 'Error'
+        if text is None:
+            query = "SELECT * FROM warehouse"
+            mycursor.execute(query)
+            warehouse_values = mycursor.fetchall()
+            mydb.commit()
+            return warehouse_values
         else:
-            print("Not Connected to database")
+            return 'Error'
+
     except psycopg2.Error:
         # Handle the database error
         print("Error get_warehouse")
@@ -613,15 +545,12 @@ def get_warehouse(text):
 
 def erase_docks():
     connect_to_database()
-
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            query = "DELETE FROM docks;"
-            mycursor.execute(query)
-            mydb.commit()
-        else:
-            print("Not Connected to database")
+        query = "DELETE FROM docks;"
+        mycursor.execute(query)
+        mydb.commit()
+
     except psycopg2.Error:
         # Handle the database error
         print("Error erase_docks")
@@ -629,15 +558,11 @@ def erase_docks():
 
 def erase_orders():
     connect_to_database()
-
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            query = "DELETE FROM orders;"
-            mycursor.execute(query)
-            mydb.commit()
-        else:
-            print("Not Connected to database")
+        query = "DELETE FROM orders;"
+        mycursor.execute(query)
+        mydb.commit()
 
     except psycopg2.Error:
         # Handle the database error
@@ -646,14 +571,11 @@ def erase_orders():
 
 def erase_dailyplan():
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            query = "DELETE FROM dailyplan;"
-            mycursor.execute(query)
-            mydb.commit()
-        else:
-            print("Not Connected to database")
+        query = "DELETE FROM dailyplan;"
+        mycursor.execute(query)
+        mydb.commit()
 
     except psycopg2.Error:
         # Handle the database error
@@ -662,15 +584,13 @@ def erase_dailyplan():
 
 def erase_facilities():
     connect_to_database()
+    mycursor = mydb.cursor()
     try:
-        if mydb is not None:
-            mycursor = mydb.cursor()
-            query = "DELETE FROM facilities;"
-            mycursor.execute(query)
-            mydb.commit()
-        else:
-            print("Not Connected to database")
+        query = "DELETE FROM facilities;"
+        mycursor.execute(query)
+        mydb.commit()
 
     except psycopg2.Error:
         # Handle the database error
         print("Error erase_facilities")
+
