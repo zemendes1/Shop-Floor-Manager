@@ -113,43 +113,32 @@ def generate_mps(orders, suppliers, day):
         # Calculate the scheduled completion date and quantity for each final product
         for final_product in final_products:
             production_time = suppliers[0].production_time(final_product)
-            num_days = quantity // 4  # Calculate the number of full production days
-            remaining_quantity = quantity % 4  # Calculate the remaining quantity after full production days
 
-            # Distribute the quantity over the production days
-            completion_date = earliest_start_date
-            for _ in range(num_days):
-                completion_date += production_time  # Add the production time for the workpiece
+            # Process the quantity in batches
+            batch_quantity = quantity
 
-                # Update the latest completion date if the current completion date is greater
-                latest_completion_date = max(latest_completion_date, completion_date)
+            # If the batch quantity exceeds 4, set it to the exact requested quantity
+            if batch_quantity > 4:
+                batch_quantity = quantity
 
-                # Add the final product information to the master production schedule
-                mps.append({
-                    "order_id": order_id,
-                    "workpiece": workpiece,
-                    "final_product": final_product,
-                    "start_date": earliest_start_date,
-                    "completion_date": completion_date,
-                    "quantity": quantity
-                })
+            # Accumulate the production time for the entire batch quantity
+            total_production_time = production_time * batch_quantity
 
-            # Add the remaining quantity to the last production day
-            if remaining_quantity > 0:
-                completion_date += production_time * remaining_quantity  # Add the production time for the remaining quantity
+            # Calculate the completion date for the current batch
+            completion_date = earliest_start_date + total_production_time
 
-                # Update the latest completion date if the current completion date is greater
-                latest_completion_date = max(latest_completion_date, completion_date)
+            # Update the latest completion date if the current completion date is greater
+            latest_completion_date = max(latest_completion_date, completion_date)
 
-                # Add the final product information to the master production schedule
-                mps.append({
-                    "order_id": order_id,
-                    "workpiece": workpiece,
-                    "final_product": final_product,
-                    "start_date": earliest_start_date,
-                    "completion_date": completion_date,
-                    "quantity": remaining_quantity
-                })
+            # Add the final product information to the master production schedule
+            mps.append({
+                "order_id": order_id,
+                "workpiece": workpiece,
+                "final_product": final_product,
+                "start_date": earliest_start_date,
+                "completion_date": completion_date,
+                "quantity": batch_quantity
+            })
 
         # Add the processed order ID to the set
         processed_order_ids.add(order_id)
@@ -228,13 +217,74 @@ def calculo_de_custos(purchasing_plan):
                 custofinal = custofinal + quant * 18
 
     return custofinal
+def penalty_calc(mps, orders):
+    matched_mps = []
+    pen = 0
+
+    for mp in mps:
+        order_id = mp["order_id"]
+        matching_order = None
+
+        for order in orders:
+            if isinstance(order, tuple):
+                # Handle tuple format where order[0] is the order ID
+                if order[0] == order_id:
+                    matching_order = order
+                    break
+            elif isinstance(order, Order):
+                # Handle Order object format where order.id is the order ID
+                if order.id == order_id:
+                    matching_order = order
+                    break
+
+        if matching_order:
+            if isinstance(matching_order, tuple):
+                # Extract attributes from the tuple
+                order_id = matching_order[0]
+                due_date = matching_order[5]
+                late_penalty = matching_order[6]
+                early_penalty = matching_order[7]
+            elif isinstance(matching_order, Order):
+                # Extract attributes from the Order object
+                order_id = matching_order.id
+                due_date = matching_order.due_date
+                late_penalty = matching_order.delay_penalty
+                early_penalty = matching_order.advance_penalty
+
+            matched_mp = {
+                "order_id": order_id,
+                "due_date": due_date,
+                "completion_date": mp["completion_date"],
+                "late_penalty": late_penalty,
+                "early_penalty": early_penalty
+            }
+            matched_mps.append(matched_mp)
+
+    for matched_mp in matched_mps:
+        if matched_mp["completion_date"] == matched_mp["due_date"]:
+            pen += 0
+        elif matched_mp["completion_date"] < matched_mp["due_date"]:
+            numdias = matched_mp["due_date"] - matched_mp["completion_date"]
+            pen =pen +  matched_mp["early_penalty"] * numdias
+        elif matched_mp["completion_date"] > matched_mp["due_date"]:
+            numdias=matched_mp["completion_date"] - matched_mp["due_date"]
+
+            pen =pen + matched_mp["late_penalty"]*numdias
+
+    return pen
+
+
 
 day = database.get_day()
 stock = database.get_warehouse(None)
 mps = generate_mps(orders, suppliers,day)
 purchasing_plan = generate_purchasing_plan(orders, suppliers)
-custofinal = calculo_de_custos(purchasing_plan)
+custo_final = calculo_de_custos(purchasing_plan)
+pen = penalty_calc(mps, orders)
+
 print("mps:", mps)  # Add this line to print the entire mps list
+
+
 
 database.create_table("dailyplan")
 
@@ -281,6 +331,9 @@ for order in mps:
         f"Workpiece: {workpiece} | Start Date: {start_date} | Completion Date: {completion_date} | Quantity: {quantity}")
     print("------------------")
 
+print("Penalties:")
+print(pen)
+
 print("Suppliers:")
 for supplier in suppliers:
     print(supplier.name, supplier.workpiece_types, supplier.min_order, supplier.price_per_piece, supplier.delivery_time)
@@ -292,7 +345,7 @@ for workpiece_type, supplier_data in purchasing_plan.items():
      print("Quantity:", supplier_data['Quantity'])
 
 print("Custo:")
-print(custofinal)
+print(custo_final)
 a = database.get_order_status('TBD')
 #print(a)
 #print(database.get_order_status('DONE'))
