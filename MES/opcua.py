@@ -9,6 +9,7 @@ from MES import dock_transformer
 url = "opc.tcp://127.0.0.1:4840/"
 
 Write_bool_value = False
+delivery = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 # Get daily Plan
 daily_plan = db.get_daily_plan(db.get_day())
@@ -74,12 +75,14 @@ async def main():
                         "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao4[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order4[i - 1][j - 1], ua.VariantType.Int16))
 
-        if delivery1 != 0:
+        if delivery[1] != 0:
             # Write Deliveries of the day
-            for j in range(1, 9):
-                node = client.get_node(
-                    "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[{}]".format(i))
-                await node.write_value(ua.Variant(delivery[i], ua.VariantType.Int16))
+            for i in range(1, 9):
+                print(delivery[i])
+                for j in range(1, 3):
+                    node = client.get_node(
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[{}][{}]".format(i, j))
+                    await node.write_value(ua.Variant(delivery[i][j], ua.VariantType.Int16))
 
         # Ler Tempo de Funcionamento de cada máquina
         for i in range(1, 5):
