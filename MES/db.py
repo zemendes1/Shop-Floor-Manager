@@ -429,6 +429,8 @@ def get_day():
 
 
 def add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    connect_to_database()
+    mycursor = mydb.cursor()
     new_warehouse = "INSERT INTO warehouse" \
                     " (p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
                     " VALUES ( {}, {}, {}, {}, {}, {}, {}, {}, {});".format(p1, p2, p3, p4, p5, p6, p7, p8, p9)
@@ -457,9 +459,13 @@ def get_warehouse(text):
         mycursor.execute(query)
         warehouse_values = mycursor.fetchall()
         mydb.commit()
-        return warehouse_values
+        return warehouse_values[0]
     else:
-        return 'Error'
+        query = "SELECT {} FROM warehouse ".format('p' + str(text))
+        mycursor.execute(query)
+        warehouse_values = mycursor.fetchone()
+        mydb.commit()
+        return warehouse_values[0]
 
 
 def erase_docks():
@@ -494,5 +500,23 @@ def erase_facilities():
     mycursor = mydb.cursor()
 
     query = "DELETE FROM facilities;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def erase_order_status():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "DELETE FROM order_status;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def erase_warehouse():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "DELETE FROM warehouse;"
     mycursor.execute(query)
     mydb.commit()
