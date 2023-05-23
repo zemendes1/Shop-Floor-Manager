@@ -11,7 +11,7 @@ create_table("warehouse")
 add_order(1, 'Client AA', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
 
 # Testing add_daily_plan function
-add_daily_plan(7, 'P3_from_P2, P3_from_P2, null, null', 'P1_on_1, null, null, null, null, null, null, null', 6, 8)
+add_daily_plan(7, 'P3_from_P2, P3_from_P2, null, null', 'P3_on_1, null, null, null, null, null, null, null', 6, 8)
 
 # Testing add_facility function
 add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -28,7 +28,7 @@ add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 #Test_Updates
 update_order(1, 'Client BB', 18, 'P9', 8, 7, 10, 5, '{1,2,3,4}', 'In Progress')
-add_daily_plan(7, 'P4_from_P2, P3_from_P2, null, null', 'P1_on_1, null, null, null, null, null, null, null', 10, 8)
+update_daily_plan(7, 'P4_from_P2, P3_from_P2, null, null', 'P3_on_1, P4_on_2, null, null, null, null, null, null', 10, 8)
 update_facility(4, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2)
 update_dock(1, 1, 1, 2, 3, 4, 5, 0, 0, 0)
 update_warehouse(1, 2, 3, 4, 5, 6, 7, 8, 9)
