@@ -202,12 +202,38 @@ def generate_purchasing_plan(orders, suppliers):
 
     return purchasing_plan
 
+def calculo_de_custos(purchasing_plan):
+    custofinal = 0
+    for workpiece_type, supplier_data in purchasing_plan.items():
+        quant = 0
+        if workpiece_type in ["P1"]:
+            if supplier_data['Supplier'] in ["Supplier A"]:
+                quant = supplier_data['Quantity']
+                custofinal = custofinal + quant*30
+            elif supplier_data['Supplier'] in ["Supplier B"]:
+                quant = supplier_data['Quantity']
+                custofinal = custofinal + quant * 45
+            elif supplier_data['Supplier'] in ["Supplier C"]:
+                quant = supplier_data['Quantity']
+                custofinal = custofinal + quant * 55
+        elif workpiece_type in ["P2"]:
+            if supplier_data['Supplier'] in ["Supplier A"]:
+                quant = supplier_data['Quantity']
+                custofinal = custofinal + quant*10
+            elif supplier_data['Supplier'] in ["Supplier B"]:
+                quant = supplier_data['Quantity']
+                custofinal = custofinal + quant * 15
+            elif supplier_data['Supplier'] in ["Supplier C"]:
+                quant = supplier_data['Quantity']
+                custofinal = custofinal + quant * 18
+
+    return custofinal
 
 day = database.get_day()
 stock = database.get_warehouse(None)
 mps = generate_mps(orders, suppliers,day)
-
 purchasing_plan = generate_purchasing_plan(orders, suppliers)
+custofinal = calculo_de_custos(purchasing_plan)
 print("mps:", mps)  # Add this line to print the entire mps list
 
 database.create_table("dailyplan")
@@ -265,6 +291,8 @@ for workpiece_type, supplier_data in purchasing_plan.items():
      print("Supplier:", supplier_data['Supplier'])
      print("Quantity:", supplier_data['Quantity'])
 
+print("Custo:")
+print(custofinal)
 a = database.get_order_status('TBD')
 #print(a)
 #print(database.get_order_status('DONE'))
