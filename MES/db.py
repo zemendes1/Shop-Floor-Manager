@@ -5,6 +5,11 @@ import math
 
 def connect_to_database():
     global mydb
+    try:
+        mydb
+    except NameError:
+        mydb = None
+
     if mydb is None:
         try:
             mydb = psycopg2.connect(
