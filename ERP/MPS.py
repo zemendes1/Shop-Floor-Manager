@@ -204,6 +204,7 @@ def generate_purchasing_plan(orders, suppliers):
 
 def process_working_orders(orders, day):
     # Define the transformation times for each workpiece
+    order_schedules =[]
     #Goal piece : transformation pieces, time
     transformation_times = {
         "P3": ("P2", 25),
@@ -226,7 +227,8 @@ def process_working_orders(orders, day):
         quantity = order[4]
         desired_piece = order[3]  # Last transformed workpiece
         status = order[9]
-        next_piece= None
+        next_piece = None
+
         queue = []
         starting_workpiece = desired_piece
         next_piece = desired_piece
@@ -239,7 +241,25 @@ def process_working_orders(orders, day):
                 break
             next_piece = val[0]
 
-        print(order_id)
+        total_time = 0
+        temp_piece = desired_piece
+        while temp_piece in transformation_times:
+            val = transformation_times[temp_piece]
+            total_time = total_time + val[1]
+            temp_piece = val[0]
+
+        total_time = total_time * quantity
+        time_days = total_time//60
+
+        order_schedules.append({
+            "order_id": order_id,
+            "workpiece": workpiece,
+            "start_date": day,
+            "completion_date": time_days,
+            "quantity": quantity
+        })
+
+        print (f"Order ID {order_id} has a total production time of {time_days}")
 
         # Check if the starting workpiece is in stock
         if database.get_warehouse(starting_workpiece) > 0:
@@ -278,8 +298,7 @@ def process_completed_orders(orders, day):
     completed_orders = []
 
     # Get the orders with the same due date as the current day
-    due_orders = [order for order in orders if order[2] == day]
-    stock = database.get_warehouse(None)
+    due_orders = [order for order in orders if order[5] == day]
     # Check the stock for each due order
     for order in due_orders:
         order_id = order[0]
