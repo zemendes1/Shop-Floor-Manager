@@ -38,7 +38,11 @@ suppliers = [
     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
-
+database.update_order_status(19, 'TBD')
+database.update_order_status(47, 'TBD')
+database.update_order_status(46, 'TBD')
+database.update_order_status(905, 'TBD')
+database.update_order_status(18, 'TBD')
 non_ordered_orders = database.get_order_status('TBD')
 #print(non_ordered_orders)
 orders = sorted(non_ordered_orders, key=lambda x: x[5])
@@ -196,14 +200,15 @@ def generate_purchasing_plan(orders, suppliers):
 
 def process_working_orders(stock, orders, day):
     # Define the transformation times for each workpiece
+    #Goal piece : transformation pieces, time
     transformation_times = {
-        "P1": {"P6": 25},
-        "P2": {"P3": 25, "P4": 25},
-        "P3": {"P6": 35},
-        "P4": {"P7": 25},
-        "P6": {"P8": 60},
-        "P7": {"P9": 25},
-        "P9": {"P5": 30},
+        "P3": [("P2", 25)],
+        "P4": [("P2", 25)],
+        "P5": [("P2", 25), ("P4", 25), ("P7", 25), ("P9", 25)],
+        "P6": [("P1", 25)],
+        "P7": [("P2", 25), ("P4", 25)],
+        "P8": [("P1", 25), ("P6", 60)],
+        "P9": [("P2", 25), ("P4", 25), ("P7", 25)]
     }
 
     # Create an empty list to store the completed transformations
@@ -213,29 +218,51 @@ def process_working_orders(stock, orders, day):
     for order in orders:
         order_id = order[0]
         due_date = order[1]
-        starting_workpiece = order[4]
+        quantity = order[4]
+        transformed_workpiece = order[3]  # Last transformed workpiece
+        status = order[9]
+        indexing_workpiece = None
+        starting_workpiece = None
+
+        if(status == "IN_PROGRESS"):
+            # Find the starting workpiece based on the transformation times
+            for indexing_workpiece, transformations in transformation_times.items():
+                for transformed_piece, _ in transformations[1]:
+                    if transformed_workpiece == indexing_workpiece:
+                        starting_workpiece = transformed_piece
+
+                if starting_workpiece is not None:
+                    break
+                if starting_workpiece is None:
+                    continue  # Skip the current order if starting_workpiece is still not assigned
+        elif(status == "TBD"):
+            # Find the starting workpiece based on the transformation times
+            for indexing_workpiece, transformations in transformation_times.items():
+                for transformed_piece, _ in transformations:
+                    if transformed_workpiece == indexing_workpiece:
+                        starting_workpiece = transformed_piece
+
+                if starting_workpiece is not None:
+                    break
 
         # Check if the starting workpiece is in stock
-        if stock[0][starting_workpiece] > 0:
+        if database.get_warehouse(starting_workpiece) > 0:
             # Iterate over the transformations for the starting workpiece
-            for transformed_workpiece, time in transformation_times[starting_workpiece].items():
+            for transformed_piece, time in transformation_times[indexing_workpiece]:
                 # Check if there are enough pieces in stock to perform the transformation
-                if stock[0][starting_workpiece] >= 1 and stock[0][transformed_workpiece] < 4:
+                if database.get_warehouse(starting_workpiece) >= 1:
                     # Perform the transformation
-                    stock[0][starting_workpiece] -= 1
-                    stock[0][transformed_workpiece] += 1
+                    #database.remove_piece_from_warehouse(starting_workpiece,1)  #RETIRAR DO STOCK
+                    #database.add_piece_to_warehouse(transformed_piece,1)  #ADICIONAR STOCK
 
                     # Add the completed transformation to the list
-                    completed_transformations.append(f"{transformed_workpiece}_from_{starting_workpiece}")
+                    completed_transformations.append(f"{starting_workpiece}_from_{transformed_piece}")
 
                     # Update the order status
-                    if stock[0][starting_workpiece] == 0:
-                        database.update_order_status(order_id, "DONE")
+                    if database.get_warehouse(indexing_workpiece) == quantity:
+                        print("DONE") #database.update_order_status(order_id, "DONE")
                     else:
-                        database.update_order_status(order_id, "IN_PROGRESS")
-
-                    # Increment the day by the transformation time
-                    day += time
+                        print("IN_PROGRESS") #database.update_order_status(order_id, "IN_PROGRESS")
 
                     # Check if the maximum number of transformations for the day has been reached
                     if len(completed_transformations) >= 4:
@@ -473,7 +500,7 @@ a = database.get_order_status('TBD')
 
 #print(database.get_order_status('IN_PROGRESS'))
 
-database.update_order_status(906, 'DONE')
+
 
 #print(database.get_order_status('DONE'))
 
