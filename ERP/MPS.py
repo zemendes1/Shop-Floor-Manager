@@ -39,7 +39,6 @@ suppliers = [
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
 
-
 non_ordered_orders = database.get_order_status('TBD')
 print (len(non_ordered_orders))
 
@@ -233,26 +232,6 @@ def process_working_orders(orders, day):
             if database.get_warehouse(starting_workpiece)>=quantity:
                 break
             next_piece = val[0]
-
-        total_time = 0
-        temp_piece = desired_piece
-        while temp_piece in transformation_times:
-            val = transformation_times[temp_piece]
-            total_time = total_time + val[1]
-            temp_piece = val[0]
-
-        total_time = total_time * quantity
-        time_days = total_time//60
-
-        order_schedules.append({
-            "order_id": order_id,
-            "start_date": day,
-            "completion_date": time_days,
-            "quantity": quantity
-        })
-
-        print (f"Order ID {order_id} has a total production time of {time_days}")
-
         # Check if the starting workpiece is in stock
         if database.get_warehouse(starting_workpiece) > 0:
             # Iterate over the transformations for the starting workpiece
@@ -317,18 +296,30 @@ def process_completed_orders(orders, day):
 
 def continuous_processing(suppliers):
     while True:
+
+        l = len(database.get_order_status("IN_PROGRESS"))
+        i = len(database.get_order_status("TBD"))
+        while l and i ==0:
+            l = len(database.get_order_status("IN_PROGRESS"))
+            i = len(database.get_order_status("TBD"))
+
         # Get the current day from the database
         day = database.get_day()
         # Get a new batch of orders
         non_ordered_orders = database.get_order_status("IN_PROGRESS")
+        tbd = False
         # Sort orders by due date
         orders = sorted(non_ordered_orders, key=lambda x: x[5])
         if len(orders)<4:
             non_ordered_orders = database.get_order_status("TBD")
             orders = sorted(non_ordered_orders, key=lambda x: x[5])
-        # Generate the purchasing plan for the day
-        purchasing_plan = generate_purchasing_plan(orders,suppliers)
+            tbd = True
 
+        # Generate the purchasing plan for the day
+        if tbd == True:
+            purchasing_plan = generate_purchasing_plan(orders,suppliers)
+        # Generate the mps
+        mps = generate_mps(orders, day, purchasing_plan)
         # Separate the quantities of P1 and P2 from the purchasing plan
         p1_tobuy = purchasing_plan.get("P1", {}).get("Quantity", 0)
         p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
@@ -340,12 +331,22 @@ def continuous_processing(suppliers):
         delivery_orders = process_completed_orders(orders, day)
         print(delivery_orders)
         # Insert the daily plan into the database
+        working_orders = ', '.join(working_orders)
+        delivery_orders = ', '.join(delivery_orders)
         database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
               f"the following delivery_orders{delivery_orders}, and the amount of P1 and P2 to buy respectively {p1_tobuy},{p2_tobuy}")
         # Wait for 60 seconds before processing the next day
+        custo_final = calculo_de_custos(purchasing_plan)
+        pen = penalty_calc(mps, orders)
+        print("Penalties:")
+        print(pen)
+        print("Custo:")
+        print(custo_final)
         print("UPDATED")
-        time.sleep(60)
+        next_day = day + 1
+        while day != next_day:
+            day = database.get_day()
 
 
 def calculo_de_custos(purchasing_plan):
@@ -434,10 +435,9 @@ def penalty_calc(mps, orders):
 
 day = database.get_day()
 stock = database.get_warehouse(None)
-purchasing_plan = generate_purchasing_plan(orders, suppliers)
-mps = generate_mps(orders,day,purchasing_plan)
-custo_final = calculo_de_custos(purchasing_plan)
-pen = penalty_calc(mps, orders)
+#purchasing_plan = generate_purchasing_plan(orders, suppliers)
+#mps = generate_mps(orders,day,purchasing_plan)
+
 
 
 # Print the values inside the mps dictionary
@@ -453,8 +453,7 @@ pen = penalty_calc(mps, orders)
 #         f"Workpiece: {workpiece} | Start Date: {start_date} | Completion Date: {completion_date} | Quantity: {quantity}")
 #     print("------------------")
 #
-print("Penalties:")
-print(pen)
+
 #
 # print("Suppliers:")
 # for supplier in suppliers:
@@ -466,7 +465,6 @@ print(pen)
 #      print("Supplier:", supplier_data['Supplier'])
 #      print("Quantity:", supplier_data['Quantity'])
 #
-print("Custo:")
-print(custo_final)
+
 
 continuous_processing(suppliers)
