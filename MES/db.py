@@ -588,3 +588,13 @@ def add_piece_to_warehouse(piece_type, number_of_pieces):
             add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8 + number_of_pieces, p9)
         elif "p" + piece_type[1] == "p9":
             add_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9 + number_of_pieces)
+
+
+def number_of_orders_stored():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    mycursor.execute("SELECT count(id) FROM orders ")
+    number_of_orders = mycursor.fetchone()
+    mydb.commit()
+    return number_of_orders[0]
