@@ -239,8 +239,7 @@ def process_working_orders(orders, day):
             # Check if there are enough pieces in stock to perform the transformation
             if database.get_warehouse(starting_workpiece) >= 1:
                 # Perform the transformation
-                database.remove_piece_from_warehouse(starting_workpiece,1)  #RETIRAR DO STOCK
-                database.add_piece_to_warehouse(prev_next_piece,1)  #ADICIONAR STOCK
+                print(f"Transforming {starting_workpiece} into {prev_next_piece}")
 
                 # Add the completed transformation to the list
                 completed_transformations.append(f"{prev_next_piece}_from_{starting_workpiece}")
@@ -279,7 +278,7 @@ def process_completed_orders(orders, day):
         # Check if the requested workpiece is in stock and in the correct quantity
         if database.get_warehouse(workpiece) >= quantity:
             # Update the stock by deducting the processed quantity
-            database.remove_piece_from_warehouse(workpiece,quantity)
+            print(f"Delivered {workpiece}")
 
             # Determine the dock number based on the count of strings ending with the number 1
             dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
