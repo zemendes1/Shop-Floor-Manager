@@ -28,30 +28,30 @@ def create_table(_table):
     if _table == "orders":
         create_script = " CREATE TABLE IF NOT EXISTS orders (" \
                         "id INT PRIMARY KEY," \
-                        "Client varchar(40) NOT NULL," \
+                        "Client varchar(200) NOT NULL," \
                         "OrderNumber INT," \
-                        "WorkPiece varchar(40) NOT NULL," \
+                        "WorkPiece varchar(200) NOT NULL," \
                         "Quantity INT," \
                         "DueDate INT," \
                         "Late_Penalty INT," \
                         "Early_Penalty INT," \
-                        "path varchar(40)," \
-                        "status varchar(40) CHECK (status = 'TBD' OR status='DONE' OR status='IN_PROGRESS')NOT NULL" \
+                        "path varchar(200)," \
+                        "status varchar(200) CHECK (status = 'TBD' OR status='DONE' OR status='IN_PROGRESS')NOT NULL" \
                         ");"
     elif _table == "order_status":
         create_script = " CREATE TABLE IF NOT EXISTS order_status(" \
                         "id INT PRIMARY KEY," \
                         "OrderNumber INT," \
-                        "done_pieces varchar(40) NOT NULL," \
-                        "pending_pieces varchar(40) NOT NULL," \
+                        "done_pieces varchar(200) NOT NULL," \
+                        "pending_pieces varchar(200) NOT NULL," \
                         "total INT not null," \
                         "total_production_time TIME not null" \
                         ");"
     elif _table == "dailyplan":
         create_script = "CREATE TABLE IF NOT EXISTS dailyPlan (" \
                         "date INT CHECK (date >=0)," \
-                        "Working_orders varchar(40)," \
-                        "Delivery_orders varchar(100), " \
+                        "Working_orders varchar(300)," \
+                        "Delivery_orders varchar(300), " \
                         "P1_toBuy INT CHECK (P1_toBuy >= 0)," \
                         "P2_toBuy INT CHECK (P2_toBuy >= 0)" \
                         ");"
