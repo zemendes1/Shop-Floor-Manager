@@ -38,7 +38,7 @@ suppliers = [
     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
-
+database.db_startup()
 non_ordered_orders = database.get_order_status('TBD')
 print (len(non_ordered_orders))
 
