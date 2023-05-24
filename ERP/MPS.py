@@ -65,12 +65,13 @@ def generate_mps(orders, day,purchasing_plan):
         "P3": 25,
         "P4": 25,
         "P5": 75,
-        "P6": 60,
+        "P6": 25,
         "P7": 60,
         "P8": 80,
         "P9": 60
     }
     previous_production_time = 0
+    previous_start_date = day
     # Initialize the latest completion date as the current day
     latest_completion_date = day
 
@@ -100,8 +101,8 @@ def generate_mps(orders, day,purchasing_plan):
 
         supplier_delivery_time = 0;
         # Determine the earliest possible start date for each final product based on supplier lead times
-        start_dates = {}
-        found_start_date = False
+
+
 
         for workpiece_type, supplier_data in purchasing_plan.items():
 
@@ -113,21 +114,27 @@ def generate_mps(orders, day,purchasing_plan):
                 elif supplier_data['Supplier'] == "Supplier C":
                     supplier_delivery_time = 1
 
-        # Check if any start dates were recorded
-        if not found_start_date:
-            if previous_production_time > 60:
-                earliest_start_date = latest_completion_date  # Set the earliest start date to the latest completion date
-                previous_production_time = production_times[workpiece]
-            else:
-                earliest_start_date = day
-                previous_production_time = production_times[workpiece]
-
+    # Check if any start dates were recorded
+        if previous_production_time >= 60:
+            earliest_start_date += 1
+            previous_production_time = production_times[workpiece]*quantity
+            previous_start_date = earliest_start_date
         else:
-            # Determine the earliest start date for this order based on the earliest start dates for its final products
-            earliest_start_date = max(start_dates.values())
+            earliest_start_date = previous_start_date
+            previous_production_time = production_times[workpiece] * quantity
+
 
         # Calculate the completion date for the current order
-        completion_date = supplier_delivery_time + earliest_start_date + (production_times[workpiece]//60)
+        if previous_production_time < 60:
+            remaining_time = previous_production_time - 60
+            print(remaining_time)
+        else:
+            remaining_time = 0
+        completion_date =earliest_start_date + (((production_times[workpiece]*quantity) + remaining_time)//60)
+        if completion_date < 0:
+            completion_date = 0
+
+        completion_date += supplier_delivery_time
         # Update the latest completion date if the current completion date is greater
         latest_completion_date = max(latest_completion_date, completion_date)
 
@@ -470,4 +477,4 @@ for workpiece_type, supplier_data in purchasing_plan.items():
 print("Custo:")
 print(custo_final)
 
-continuous_processing(suppliers)
+#continuous_processing(suppliers)
