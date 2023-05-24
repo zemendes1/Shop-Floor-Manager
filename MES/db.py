@@ -2,8 +2,6 @@ import psycopg2
 import datetime
 import math
 
-mydb = None
-
 
 def connect_to_database():
     global mydb
