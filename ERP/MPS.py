@@ -299,7 +299,7 @@ def continuous_processing(suppliers):
 
         l = len(database.get_order_status("IN_PROGRESS"))
         i = len(database.get_order_status("TBD"))
-        while l and i ==0:
+        while l==0 and i ==0:
             l = len(database.get_order_status("IN_PROGRESS"))
             i = len(database.get_order_status("TBD"))
 
