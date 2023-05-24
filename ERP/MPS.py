@@ -39,21 +39,12 @@ suppliers = [
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
 
-database.update_order_status(19, 'TBD')
-database.update_order_status(47, 'TBD')
-database.update_order_status(46, 'TBD')
-database.update_order_status(18, 'TBD')
-database.update_order_status(906, 'TBD')
-database.update_order_status(19, 'TBD')
-database.update_order_status(41, 'TBD')
-database.update_order_status(42, 'TBD')
 
-database.update_warehouse(5,5,0,0,0,0,0,0,0)
 non_ordered_orders = database.get_order_status('TBD')
 print (len(non_ordered_orders))
-#print(non_ordered_orders)
+
 orders = sorted(non_ordered_orders, key=lambda x: x[5])
-#print(orders)
+
 
 
 def generate_mps(orders, day,purchasing_plan):
@@ -330,10 +321,12 @@ def continuous_processing(suppliers):
         # Get the current day from the database
         day = database.get_day()
         # Get a new batch of orders
-        non_ordered_orders = database.get_order_status('TBD')
+        non_ordered_orders = database.get_order_status("IN_PROGRESS")
         # Sort orders by due date
         orders = sorted(non_ordered_orders, key=lambda x: x[5])
-
+        if len(orders)<4:
+            non_ordered_orders = database.get_order_status("TBD")
+            orders = sorted(non_ordered_orders, key=lambda x: x[5])
         # Generate the purchasing plan for the day
         purchasing_plan = generate_purchasing_plan(orders,suppliers)
 
@@ -449,32 +442,32 @@ pen = penalty_calc(mps, orders)
 
 
 # Print the values inside the mps dictionary
-for order in mps:
-    order_id = order["order_id"]
-    workpiece = order["workpiece"]
-    start_date = order["start_date"]
-    completion_date = order["completion_date"]
-    quantity = order["quantity"]
-
-    print(f"Order ID: {order_id}")
-    print(
-        f"Workpiece: {workpiece} | Start Date: {start_date} | Completion Date: {completion_date} | Quantity: {quantity}")
-    print("------------------")
-
+# for order in mps:
+#     order_id = order["order_id"]
+#     workpiece = order["workpiece"]
+#     start_date = order["start_date"]
+#     completion_date = order["completion_date"]
+#     quantity = order["quantity"]
+#
+#     print(f"Order ID: {order_id}")
+#     print(
+#         f"Workpiece: {workpiece} | Start Date: {start_date} | Completion Date: {completion_date} | Quantity: {quantity}")
+#     print("------------------")
+#
 print("Penalties:")
 print(pen)
-
-print("Suppliers:")
-for supplier in suppliers:
-    print(supplier.name, supplier.workpiece_types, supplier.min_order, supplier.price_per_piece, supplier.delivery_time)
-
-print("Purchasing Plan:")
-for workpiece_type, supplier_data in purchasing_plan.items():
-     print("Workpiece Type:", workpiece_type)
-     print("Supplier:", supplier_data['Supplier'])
-     print("Quantity:", supplier_data['Quantity'])
-
+#
+# print("Suppliers:")
+# for supplier in suppliers:
+#     print(supplier.name, supplier.workpiece_types, supplier.min_order, supplier.price_per_piece, supplier.delivery_time)
+#
+# print("Purchasing Plan:")
+# for workpiece_type, supplier_data in purchasing_plan.items():
+#      print("Workpiece Type:", workpiece_type)
+#      print("Supplier:", supplier_data['Supplier'])
+#      print("Quantity:", supplier_data['Quantity'])
+#
 print("Custo:")
 print(custo_final)
 
-#continuous_processing(suppliers)
+continuous_processing(suppliers)
