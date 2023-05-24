@@ -10,17 +10,12 @@ def connect_to_database():
     except NameError:
         mydb = None
 
-    if mydb is None:
-        try:
-            mydb = psycopg2.connect(
-                host="db.fe.up.pt",
-                user="up201906869",
-                password="infi2023",
-                database="up201906869"
-            )
-        except psycopg2.Error as e:
-            print("Error connecting to the database: {}".format(e))
-            # Handle the connection error
+    mydb = psycopg2.connect(
+        host="db.fe.up.pt",
+        user="up201906869",
+        password="infi2023",
+        database="up201906869"
+    )
 
 
 def create_table(_table):
