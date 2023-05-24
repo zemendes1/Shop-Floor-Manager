@@ -246,7 +246,6 @@ def process_working_orders(orders, day):
 
         order_schedules.append({
             "order_id": order_id,
-            "workpiece": workpiece,
             "start_date": day,
             "completion_date": time_days,
             "quantity": quantity
