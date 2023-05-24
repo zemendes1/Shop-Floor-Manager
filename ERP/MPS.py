@@ -38,7 +38,14 @@ suppliers = [
     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
 ]
+database.update_order_status(19, 'TBD')
+database.update_order_status(47, 'TBD')
+database.update_order_status(46, 'TBD')
+database.update_order_status(18, 'TBD')
+database.update_order_status(905, 'TBD')
+database.update_order_status(19, 'TBD')
 database.update_order_status(41, 'TBD')
+
 database.update_warehouse(5,5,0,0,0,0,0,0,0)
 non_ordered_orders = database.get_order_status('TBD')
 #print(non_ordered_orders)
@@ -160,7 +167,7 @@ def generate_purchasing_plan(orders, suppliers):
         # Determine the appropriate workpiece type to order based on the given workpiece type
         if workpiece_type in ["P6", "P8"]:
             required_workpiece_type = "P1"
-        else:
+        elif workpiece_type in ["P3", "P4", "P5", "P7", "P9"]:
             required_workpiece_type = "P2"
 
         # Add the quantity to the purchasing plan for the corresponding workpiece type
@@ -195,7 +202,7 @@ def generate_purchasing_plan(orders, suppliers):
     return purchasing_plan
 
 
-def process_working_orders(stock, orders, day):
+def process_working_orders(orders, day):
     # Define the transformation times for each workpiece
     #Goal piece : transformation pieces, time
     transformation_times = {
@@ -298,7 +305,6 @@ def process_completed_orders(orders, day):
 
 
 def continuous_processing(suppliers):
-    purchasing_plan = {}
     while True:
         # Get the current day from the database
         day = database.get_day()
@@ -308,21 +314,22 @@ def continuous_processing(suppliers):
         orders = sorted(non_ordered_orders, key=lambda x: x[5])
 
         # Generate the purchasing plan for the day
-        purchasing_plan = generate_purchasing_plan(orders, suppliers)
+        purchasing_plan = generate_purchasing_plan(orders,suppliers)
 
         # Separate the quantities of P1 and P2 from the purchasing plan
         p1_tobuy = purchasing_plan.get("P1", {}).get("Quantity", 0)
         p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
 
         # Generate the master production schedule for the day
-        working_orders = generate_mps(orders, suppliers, day)
-
+        working_orders = process_working_orders(orders,day)
+        print(working_orders)
         # Process the completed orders and determine the delivery orders for the day
-        delivery_orders = process_completed_orders(stock, orders, day)
-
+        delivery_orders = process_completed_orders(orders, day)
+        print(delivery_orders)
         # Insert the daily plan into the database
         database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
-
+        print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
+              f"the following delivery_orders{delivery_orders}, and the amount of P1 and P2 to buy respectively {p1_tobuy},{p2_tobuy}")
         # Wait for 60 seconds before processing the next day
         print("UPDATED")
         time.sleep(60)
@@ -419,15 +426,7 @@ purchasing_plan = generate_purchasing_plan(orders, suppliers)
 custo_final = calculo_de_custos(purchasing_plan)
 pen = penalty_calc(mps, orders)
 
-print(process_working_orders(stock, orders, day))
-print("mps:", mps)  # Add this line to print the entire mps list
-
-
-
-database.create_table("dailyplan")
-
 order = orders  # Since there is only one order, assign it directly to the 'order' variable
-
 workpiece_type = order[3]  # Index 3 corresponds to the 'workpiece_type' in the tuple
 quantity = order[4]  # Index 4 corresponds to the 'quantity' in the tuple
 for i in range(1):
@@ -484,17 +483,5 @@ for workpiece_type, supplier_data in purchasing_plan.items():
 
 print("Custo:")
 print(custo_final)
-a = database.get_order_status('TBD')
-#print(a)
-#print(database.get_order_status('DONE'))
 
-#print(database.get_order_status('IN_PROGRESS'))
-
-
-
-#print(database.get_order_status('DONE'))
-
-id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path, status = a[0]
-#print(id_order)
-
-continuous_processing(orders)
+continuous_processing(suppliers)
