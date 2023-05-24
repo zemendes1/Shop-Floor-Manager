@@ -598,3 +598,30 @@ def number_of_orders_stored():
     number_of_orders = mycursor.fetchone()
     mydb.commit()
     return number_of_orders[0]
+
+
+def db_startup():
+    create_table("orders")
+    create_table("dailyplan")
+    create_table("facilities")
+    create_table("docks")
+    create_table("day")
+    create_table("warehouse")
+
+    erase_orders()
+
+    erase_dailyplan()
+
+    erase_docks()
+    add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    erase_facilities()
+    add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_facility(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_facility(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    erase_warehouse()
+    add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    erase_order_status()
