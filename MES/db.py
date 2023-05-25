@@ -178,6 +178,23 @@ def get_order(id_order):
         mydb.commit()
     return order_values
 
+def get_order_status_table(id_order):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    if id_order is None:
+        query = "SELECT * FROM order_status order by id"
+        mycursor.execute(query)
+        order_values = mycursor.fetchall()
+        mydb.commit()
+    else:
+        query = "SELECT * FROM order_status WHERE id= {}".format(id_order)
+        mycursor.execute(query)
+        order_values = mycursor.fetchone()
+        mydb.commit()
+    return order_values
+
+
 
 def get_order_status(status_of_order):
     connect_to_database()

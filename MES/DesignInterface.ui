@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>1305</width>
-    <height>746</height>
+    <height>778</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>MES Interface</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -20,22 +20,22 @@
       <x>0</x>
       <y>0</y>
       <width>1331</width>
-      <height>721</height>
+      <height>761</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="Orders">
      <attribute name="title">
-      <string>Orders and Daily Plan Tables</string>
+      <string>Order Status and Daily Plan Tables</string>
      </attribute>
      <widget class="QTableWidget" name="tableWidget_2">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>360</y>
-        <width>1121</width>
+        <y>390</y>
+        <width>1081</width>
         <height>291</height>
        </rect>
       </property>
@@ -72,7 +72,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>330</y>
+        <y>350</y>
         <width>161</width>
         <height>31</height>
        </rect>
@@ -85,8 +85,8 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>40</y>
-        <width>1121</width>
+        <y>50</y>
+        <width>1081</width>
         <height>291</height>
        </rect>
       </property>
@@ -100,47 +100,27 @@
       </column>
       <column>
        <property name="text">
-        <string>Client</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
         <string>OrderNumber</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>WorkPiece</string>
+        <string>Done_Pieces</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Quantity</string>
+        <string>Pending_Pieces</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>DueDate</string>
+        <string>Total</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>Late_Penalty</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Early_Penalty</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Path</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Status</string>
+        <string>Total_Production_Time</string>
        </property>
       </column>
      </widget>
@@ -149,12 +129,12 @@
        <rect>
         <x>20</x>
         <y>10</y>
-        <width>131</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline;&quot;&gt;Table: Orders&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline;&quot;&gt;Table: Order Status&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
     </widget>
@@ -179,7 +159,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>40</y>
+        <y>50</y>
         <width>941</width>
         <height>291</height>
        </rect>
@@ -255,8 +235,8 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>330</y>
-        <width>151</width>
+        <y>350</y>
+        <width>141</width>
         <height>31</height>
        </rect>
       </property>
@@ -268,7 +248,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>360</y>
+        <y>390</y>
         <width>941</width>
         <height>321</height>
        </rect>
@@ -326,6 +306,39 @@
         <string>Total</string>
        </property>
       </column>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>980</x>
+        <y>40</y>
+        <width>191</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline;&quot;&gt;Current Day:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="CurrentDay">
+      <property name="geometry">
+       <rect>
+        <x>980</x>
+        <y>70</y>
+        <width>61</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+        <underline>false</underline>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="text">
+       <string>2</string>
+      </property>
      </widget>
     </widget>
    </widget>

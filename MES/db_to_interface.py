@@ -85,7 +85,31 @@ def convert_string_dock(input_str):
     }
     return result
 
+def order_status(id):
+    return_query = db.get_order_status_table(id)
+    if id is None:
+        formatted_str = []
+        for i in range(len(return_query)):
+            if len(return_query) - i > 1:
+                formatted_str.append(convert_string_order_status(return_query[i]))
+            else:
+                formatted_str.append(convert_string_order_status(return_query[i]))
+        return formatted_str
+    else:
+        formatted_str = convert_string_order_status(return_query)
+        return [formatted_str]
 
+def convert_string_order_status(input_str):
+    values = list(input_str)
+    result = {
+        "id": str(values[0]),
+        "ordernumber": str(values[1]),
+        "done_pieces": str(values[2]),
+        "pending_pieces": str(values[3]),
+        "total": str(values[4]),
+        "total_production_time": str(values[5]),
+    }
+    return result
 def dock(num):
     return_query = db.get_dock(num)
     if num is None:
