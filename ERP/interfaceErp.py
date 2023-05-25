@@ -138,7 +138,6 @@ class Ui_MainWindow(object):
 
         self.loaddata()
         self.timer = QTimer()
-        print(1)
         self.timer.timeout.connect(self.updateMode)
         self.timer.start(5000)
 

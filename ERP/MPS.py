@@ -1,8 +1,10 @@
 import MES.db as database
 import time
 
+
 class Order:
-    def __init__(self, id, client, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty, path, status):
+    def __init__(self, id, client, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty,
+                 path, status):
         self.id = id
         self.client = client
         self.order_number = order_number
@@ -33,19 +35,7 @@ class Supplier:
         return self.delivery_time[workpiece_type]
 
 
-suppliers = [
-    Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
-    Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
-    Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
-]
-non_ordered_orders = database.get_order_status('TBD')
-print (len(non_ordered_orders))
-
-orders = sorted(non_ordered_orders, key=lambda x: x[5])
-
-
-
-def generate_mps(orders, day,purchasing_plan):
+def generate_mps(orders, day, purchasing_plan):
     # Initialize the master production schedule
     mps = []
 
@@ -91,11 +81,9 @@ def generate_mps(orders, day,purchasing_plan):
         supplier_delivery_time = 0;
         # Determine the earliest possible start date for each final product based on supplier lead times
 
-
-
         for workpiece_type, supplier_data in purchasing_plan.items():
 
-            if required_workpiece_type == workpiece_type :
+            if required_workpiece_type == workpiece_type:
                 if supplier_data['Supplier'] == "Supplier A":
                     supplier_delivery_time = 4
                 elif supplier_data['Supplier'] == "Supplier B":
@@ -103,15 +91,14 @@ def generate_mps(orders, day,purchasing_plan):
                 elif supplier_data['Supplier'] == "Supplier C":
                     supplier_delivery_time = 1
 
-    # Check if any start dates were recorded
+        # Check if any start dates were recorded
         if previous_production_time >= 60:
             earliest_start_date += 1
-            previous_production_time = production_times[workpiece]*quantity
+            previous_production_time = production_times[workpiece] * quantity
             previous_start_date = earliest_start_date
         else:
             earliest_start_date = previous_start_date
             previous_production_time = production_times[workpiece] * quantity
-
 
         # Calculate the completion date for the current order
         if previous_production_time < 60:
@@ -119,7 +106,7 @@ def generate_mps(orders, day,purchasing_plan):
             print(remaining_time)
         else:
             remaining_time = 0
-        completion_date =earliest_start_date + (((production_times[workpiece]*quantity) + remaining_time)//60)
+        completion_date = earliest_start_date + (((production_times[workpiece] * quantity) + remaining_time) // 60)
         if completion_date < 0:
             completion_date = 0
 
@@ -127,7 +114,7 @@ def generate_mps(orders, day,purchasing_plan):
         # Update the latest completion date if the current completion date is greater
         latest_completion_date = max(latest_completion_date, completion_date)
 
-            # Add the final product information to the master production schedule
+        # Add the final product information to the master production schedule
         mps.append({
             "order_id": order_id,
             "workpiece": workpiece,
@@ -172,9 +159,9 @@ def generate_purchasing_plan(orders, suppliers):
         selected_supplier = None
         for supplier in suppliers:
             if (
-                workpiece_type in supplier.workpiece_types
-                and supplier.min_order <= quantity
-                and (selected_supplier is None or supplier.min_order > selected_supplier.min_order)
+                    workpiece_type in supplier.workpiece_types
+                    and supplier.min_order <= quantity
+                    and (selected_supplier is None or supplier.min_order > selected_supplier.min_order)
             ):
                 selected_supplier = supplier
 
@@ -196,8 +183,8 @@ def generate_purchasing_plan(orders, suppliers):
 
 def process_working_orders(orders, day):
     # Define the transformation times for each workpiece
-    order_schedules =[]
-    #Goal piece : transformation pieces, time
+    order_schedules = []
+    # Goal piece : transformation pieces, time
     transformation_times = {
         "P3": ("P2", 25),
         "P4": ("P2", 25),
@@ -229,7 +216,7 @@ def process_working_orders(orders, day):
             val = transformation_times[starting_workpiece]
             queue.append(val)
             starting_workpiece = val[0]
-            if database.get_warehouse(starting_workpiece)>=quantity:
+            if database.get_warehouse(starting_workpiece) >= quantity:
                 break
             next_piece = val[0]
         # Check if the starting workpiece is in stock
@@ -294,8 +281,7 @@ def process_completed_orders(orders, day):
 
 
 def continuous_processing():
-
-    #Define suppliers
+    # Define suppliers
     suppliers = [
         Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
         Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
@@ -304,7 +290,7 @@ def continuous_processing():
     while True:
         l = len(database.get_order_status("IN_PROGRESS"))
         i = len(database.get_order_status("TBD"))
-        while l==0 and i ==0:
+        while l == 0 and i == 0:
             l = len(database.get_order_status("IN_PROGRESS"))
             i = len(database.get_order_status("TBD"))
 
@@ -315,7 +301,7 @@ def continuous_processing():
         tbd = False
         # Sort orders by due date
         orders = sorted(non_ordered_orders, key=lambda x: x[5])
-        if len(orders)<4:
+        if len(orders) < 4:
             non_ordered_orders = database.get_order_status("TBD")
             orders = sorted(non_ordered_orders, key=lambda x: x[5])
             tbd = True
@@ -324,7 +310,7 @@ def continuous_processing():
 
         # Generate the purchasing plan for the day
         if tbd == True:
-            purchasing_plan = generate_purchasing_plan(orders,suppliers)
+            purchasing_plan = generate_purchasing_plan(orders, suppliers)
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
         # Separate the quantities of P1 and P2 from the purchasing plan
@@ -354,7 +340,7 @@ def continuous_processing():
         elif p2_supplier == "Supplier C":
             supplier2_time = 1
         # Generate the master production schedule for the day
-        working_orders = process_working_orders(orders,day)
+        working_orders = process_working_orders(orders, day)
         print(working_orders)
         # Process the completed orders and determine the delivery orders for the day
         delivery_orders = process_completed_orders(orders, day)
@@ -362,7 +348,8 @@ def continuous_processing():
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
         delivery_orders = ', '.join(delivery_orders)
-        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy,supplier1_time,supplier2_time)
+        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy, supplier1_time,
+                                supplier2_time)
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
               f"the following delivery_orders{delivery_orders}. The amount of P1 and P2 to buy are respectively {p1_tobuy},{p2_tobuy},"
               f" which will be delivered in {supplier1_time} days and in {supplier2_time} days")
@@ -385,8 +372,8 @@ def calculo_de_custos(purchasing_plan):
         if workpiece_type in ["P1"]:
             if supplier_data['Supplier'] in ["Supplier A"]:
                 quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"],quant*30)
-                custofinal = custofinal + quant*30
+                database.update_order_cost(supplier_data["OrderID"], quant * 30)
+                custofinal = custofinal + quant * 30
             elif supplier_data['Supplier'] in ["Supplier B"]:
                 quant = supplier_data['Quantity']
                 database.update_order_cost(supplier_data["OrderID"], quant * 45)
@@ -399,7 +386,7 @@ def calculo_de_custos(purchasing_plan):
             if supplier_data['Supplier'] in ["Supplier A"]:
                 quant = supplier_data['Quantity']
                 database.update_order_cost(supplier_data["OrderID"], quant * 10)
-                custofinal = custofinal + quant*10
+                custofinal = custofinal + quant * 10
             elif supplier_data['Supplier'] in ["Supplier B"]:
                 quant = supplier_data['Quantity']
                 database.update_order_cost(supplier_data["OrderID"], quant * 15)
@@ -460,19 +447,19 @@ def penalty_calc(mps, orders):
             pen += 0
         elif matched_mp["completion_date"] < matched_mp["due_date"]:
             numdias = matched_mp["due_date"] - matched_mp["completion_date"]
-            pen =pen +  matched_mp["early_penalty"] * numdias
+            pen = pen + matched_mp["early_penalty"] * numdias
         elif matched_mp["completion_date"] > matched_mp["due_date"]:
-            numdias=matched_mp["completion_date"] - matched_mp["due_date"]
+            numdias = matched_mp["completion_date"] - matched_mp["due_date"]
 
-            pen =pen + matched_mp["late_penalty"]*numdias
+            pen = pen + matched_mp["late_penalty"] * numdias
 
     return pen
 
-day = database.get_day()
-stock = database.get_warehouse(None)
-#purchasing_plan = generate_purchasing_plan(orders, suppliers)
-#mps = generate_mps(orders,day,purchasing_plan)
 
+# day = database.get_day()
+# stock = database.get_warehouse(None)
+# purchasing_plan = generate_purchasing_plan(orders, suppliers)
+# mps = generate_mps(orders,day,purchasing_plan)
 
 
 # Print the values inside the mps dictionary
@@ -502,4 +489,14 @@ stock = database.get_warehouse(None)
 #
 
 
-continuous_processing()
+suppliers = [
+    Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
+    Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
+    Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
+]
+non_ordered_orders = database.get_order_status('TBD')
+# print (len(non_ordered_orders))
+
+orders = sorted(non_ordered_orders, key=lambda x: x[5])
+
+# continuous_processing()
