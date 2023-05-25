@@ -8,7 +8,6 @@ from MES import db
 def execute_xml():
     while True:
         receive_xml.run_xml()
-        print("teste")
 
 
 def execute_interface():
