@@ -48,7 +48,8 @@ def convert_string_order(input_str):
         "Early_Penalty": str(values[7]),
         "path": str(values[8]),
         "status": str(values[9]),
-        "custo": str(values[10])
+        "custo": str(values[10]),
+        "penalties": str(values[11])
     }
     return result
 
