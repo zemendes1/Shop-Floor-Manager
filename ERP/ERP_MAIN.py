@@ -1,22 +1,22 @@
-from ERP import interfaceErp as inter
+from ERP import interfaceErp
 import multiprocessing
+from MES import db
 # from ERP import MPS
 from ERP import receive_xml
 
 
-
 def execute_interface():
-    inter.setup_interface()
+    # interfaceErp.setup_interface()
+    pass
 
 
 def execute_everything_else():
+    db.db_startup()
     while True:
         receive_xml.run_xml()
 
 
-
 if __name__ == '__main__':
-
     # add this check and freeze_support() call
     multiprocessing.freeze_support()
 
