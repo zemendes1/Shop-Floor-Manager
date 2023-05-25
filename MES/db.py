@@ -51,7 +51,9 @@ def create_table(_table):
                         "Working_orders varchar(300)," \
                         "Delivery_orders varchar(300), " \
                         "P1_toBuy INT CHECK (P1_toBuy >= 0)," \
-                        "P2_toBuy INT CHECK (P2_toBuy >= 0)" \
+                        "P2_toBuy INT CHECK (P2_toBuy >= 0)," \
+                        "P1_Arriving INT CHECK (P1_Arriving>=0)," \
+                        "P2_Arriving INT CHECK (P2_Arriving>=0)" \
                         ");"
 
     elif _table == "facilities":
@@ -198,7 +200,7 @@ def update_order_status(order, new_status):
     return 0
 
 
-def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
+def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving):
     connect_to_database()
     mycursor = mydb.cursor()
 
@@ -213,9 +215,9 @@ def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
     else:
         # If entry does not exist, add new plan to database
         new_plan = "INSERT INTO dailyplan" \
-                   " (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)" \
-                   " VALUES (%s, %s, %s, %s, %s)"
-        values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
+                   " (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving)" \
+                   " VALUES (%s, %s, %s, %s, %s, %s, %s)"
+        values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving)
         mycursor.execute(new_plan, values)
         mydb.commit()
     return 0
@@ -238,13 +240,14 @@ def get_daily_plan(date):
     return daily_plan_values
 
 
-def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy):
+def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving):
     connect_to_database()
     mycursor = mydb.cursor()
 
     update_plan = "UPDATE dailyplan SET working_orders = '{}', delivery_orders = '{}'" \
                   ", p1_tobuy = {}, p2_tobuy = {}" \
-                  " WHERE date = '{}';".format(working_orders, delivery_orders, p1_tobuy, p2_tobuy, date)
+                  " WHERE date = '{}';".format(working_orders, delivery_orders, p1_tobuy,
+                                               p2_tobuy, p1_Arriving, p2_Arriving, date)
     mycursor.execute(update_plan)
     mydb.commit()
     return 0
@@ -408,9 +411,8 @@ def insert_or_update_time(elapsed_time):
         else:
             try:
                 # insert new row with day and time_elapsed values
-                mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES ({}, '{}')".format(current_day,
-                                                                                                convert_ms_to_postgre_time(
-                                                                                                    elapsed_time)))
+                mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES"
+                                 " ({}, '{}')".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
                 mydb.commit()
                 # code that interacts with the database
             except psycopg2.Error as e:
@@ -450,7 +452,8 @@ def update_warehouse(p1, p2, p3, p4, p5, p6, p7, p8, p9):
     mycursor = mydb.cursor()
 
     update_query = "UPDATE warehouse SET" \
-                   " p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}".format(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+                   " p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}".format(p1, p2, p3, p4, p5,
+                                                                                           p6, p7, p8, p9)
     mycursor.execute(update_query)
     mydb.commit()
     return 0

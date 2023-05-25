@@ -28,6 +28,8 @@ if __name__ == '__main__':
     db.create_table("docks")
     db.create_table("day")
     db.create_table("warehouse")
+    db.create_table("docks_total")
+    db.create_table("current_order_list")
     # add this check and freeze_support() call
     multiprocessing.freeze_support()
 
