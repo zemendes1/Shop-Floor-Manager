@@ -313,7 +313,7 @@ def continuous_processing():
             P_orders = database.get_order_path('{}')
             purchasing_plan = generate_purchasing_plan(orders, suppliers)
             for order in P_orders:
-                database.update_order_path(order,'Bought')
+                database.update_order_path(order[0], 'Bought')
 
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
