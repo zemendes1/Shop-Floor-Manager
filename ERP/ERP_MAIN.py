@@ -1,11 +1,11 @@
-from ERP import interfaceErp
 import multiprocessing
-from MES import db
-from ERP import MPS
 from ERP import receive_xml
+from ERP import interfaceErp
+from ERP import MPS
+from MES import db
 
 
-def execute_everything_else():
+def execute_xml():
     receive_xml.run_xml()
 
 
@@ -14,8 +14,7 @@ def execute_interface():
 
 
 def execute_mps():
-    # MPS.continuous_processing()
-    pass
+    MPS.continuous_processing()
 
 
 if __name__ == '__main__':
@@ -24,9 +23,9 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
 
     # create processes for each function
-    process3 = multiprocessing.Process(target=execute_everything_else)
-    process1 = multiprocessing.Process(target=execute_interface)
-    process2 = multiprocessing.Process(target=execute_mps)
+    process1 = multiprocessing.Process(target=execute_xml)
+    process2 = multiprocessing.Process(target=execute_interface)
+    process3 = multiprocessing.Process(target=execute_mps)
 
     # start the processes
     process1.start()
