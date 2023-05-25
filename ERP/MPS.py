@@ -310,7 +310,11 @@ def continuous_processing():
 
         # Generate the purchasing plan for the day
         if tbd == True:
+            P_orders = database.get_order_path('{}')
             purchasing_plan = generate_purchasing_plan(orders, suppliers)
+            for order in P_orders:
+                database.update_order_path(order,'Bought')
+
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
         # Separate the quantities of P1 and P2 from the purchasing plan
@@ -319,13 +323,9 @@ def continuous_processing():
 
         p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
         p2_supplier = purchasing_plan.get("P2", {}).get("Supplier", 0)
-        print(p1_supplier)
-        print(p2_supplier)
 
         custo_final = calculo_de_custos(purchasing_plan)
         pen = penalty_calc(mps, orders)
-        for order in orders:
-            print(order[10])
 
         if p1_supplier == "Supplier A":
             supplier1_time = 4
@@ -339,12 +339,11 @@ def continuous_processing():
             supplier2_time = 2
         elif p2_supplier == "Supplier C":
             supplier2_time = 1
-        # Generate the master production schedule for the day
+        # Process the working orders
         working_orders = process_working_orders(orders, day)
-        print(working_orders)
         # Process the completed orders and determine the delivery orders for the day
         delivery_orders = process_completed_orders(orders, day)
-        print(delivery_orders)
+
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
         delivery_orders = ', '.join(delivery_orders)
