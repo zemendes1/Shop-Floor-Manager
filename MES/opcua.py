@@ -17,7 +17,7 @@ async def main():
     current_day = db.get_day()
     daily_plan = db.get_daily_plan(current_day)
     if daily_plan is not None:
-        get_date, get_working_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy = daily_plan
+        get_date, get_working_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy, get_p1_arriving, get_p2_arriving = daily_plan
 
         order1, order2, order3, order4 = get_working_orders.split(', ')
         order1 = Piece.define_vector(order1)
@@ -47,7 +47,7 @@ async def main():
         node = client.get_node(
             "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.dia_atual")
         await node.write_value(ua.Variant(current_day, ua.VariantType.Int16))
-        
+
         if order1 != 0:
             # Write Working Order #1 of the day
             for i in range(1, 3):
