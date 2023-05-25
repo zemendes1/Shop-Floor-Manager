@@ -1,12 +1,13 @@
 from ERP import interfaceErp
 import multiprocessing
 from MES import db
-# from ERP import MPS
+from ERP import MPS
 from ERP import receive_xml
 
 
 def execute_interface():
     interfaceErp.setup_interface()
+    MPS.continuous_processing()
     pass
 
 

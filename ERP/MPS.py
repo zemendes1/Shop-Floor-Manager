@@ -293,7 +293,14 @@ def process_completed_orders(orders, day):
     return completed_orders
 
 
-def continuous_processing(suppliers):
+def continuous_processing():
+
+    #Define suppliers
+    suppliers = [
+        Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
+        Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
+        Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
+    ]
     while True:
         l = len(database.get_order_status("IN_PROGRESS"))
         i = len(database.get_order_status("TBD"))
@@ -495,4 +502,4 @@ stock = database.get_warehouse(None)
 #
 
 
-continuous_processing(suppliers)
+continuous_processing()
