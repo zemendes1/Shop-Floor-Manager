@@ -37,7 +37,8 @@ def create_table(_table):
                         "Early_Penalty INT," \
                         "path varchar(200)," \
                         "status varchar(200) CHECK (status = 'TBD' OR status='DONE' OR status='IN_PROGRESS')NOT NULL," \
-                        "custo INT " \
+                        "custo INT, " \
+                        "penalties INT"\
                         ");"
     elif _table == "order_status":
         create_script = " CREATE TABLE IF NOT EXISTS order_status(" \
@@ -123,7 +124,7 @@ def create_table(_table):
 
 
 def add_order(id_order, client, ordernumber, workpiece, quantity, duedate,
-              late_penalty, early_penalty, path, status, custo):
+              late_penalty, early_penalty, path, status, custo, penalties):
     connect_to_database()
     mycursor = mydb.cursor()
 
@@ -138,25 +139,25 @@ def add_order(id_order, client, ordernumber, workpiece, quantity, duedate,
     # If entry does not exist, add new order to database
     new_order = "INSERT INTO orders" \
                 " (id, client, ordernumber, workpiece, quantity, duedate," \
-                " late_penalty, early_penalty, path, status, custo)" \
-                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                " late_penalty, early_penalty, path, status, custo, penalties)" \
+                " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     values = (id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty,
-              path, status, custo)
+              path, status, custo, penalties)
     mycursor.execute(new_order, values)
     mydb.commit()
     return 0
 
 
 def update_order(id_order, client, ordernumber, workpiece, quantity, duedate, late_penalty, early_penalty, path,
-                 status, custo):
+                 status, custo, penalties):
     connect_to_database()
     mycursor = mydb.cursor()
 
     new_order = "UPDATE orders SET " \
                 "client='{}', ordernumber={}, workpiece='{}', quantity={}, duedate={}, late_penalty={}," \
-                " early_penalty={}, path='{}', status='{}', custo={}" \
+                " early_penalty={}, path='{}', status='{}', custo={}, penalties={}" \
                 " WHERE id={}".format(client, ordernumber, workpiece, quantity, duedate, late_penalty,
-                                      early_penalty, path, status, id_order, custo)
+                                      early_penalty, path, status, id_order, custo, penalties)
     mycursor.execute(new_order)
     mydb.commit()
     return 0
