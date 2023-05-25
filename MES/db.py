@@ -209,6 +209,7 @@ def get_order_status(status_of_order):
     else:
         return 'ERROR'
 
+
 def get_order_path(caminho):
     connect_to_database()
     mycursor = mydb.cursor()
@@ -454,7 +455,8 @@ def insert_or_update_time(elapsed_time):
         MILLISECONDS_PER_DAY = 60 * 1000
         # Calculate the number of days
         current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
-
+        if elapsed_time == 0:
+            current_day = 0
         if existing_row:
             # update existing row with new day and time_elapsed values
             mycursor.execute(
@@ -690,4 +692,4 @@ def db_startup():
     add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
     erase_order_status()
 
-    db.insert_or_update_time(0)
+    insert_or_update_time(0)
