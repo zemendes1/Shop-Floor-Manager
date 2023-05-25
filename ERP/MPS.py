@@ -455,7 +455,6 @@ def penalty_calc(mps, orders):
 
     return pen
 
-
 # day = database.get_day()
 # stock = database.get_warehouse(None)
 # purchasing_plan = generate_purchasing_plan(orders, suppliers)
@@ -489,14 +488,18 @@ def penalty_calc(mps, orders):
 #
 
 
-suppliers = [
-    Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
-    Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
-    Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
-]
-non_ordered_orders = database.get_order_status('TBD')
-# print (len(non_ordered_orders))
 
-orders = sorted(non_ordered_orders, key=lambda x: x[5])
+# suppliers = [
+#     Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
+#     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
+#     Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
+# ]
+# non_ordered_orders = database.get_order_status('TBD')
+# # print (len(non_ordered_orders))
+#
+# orders = sorted(non_ordered_orders, key=lambda x: x[5])
+#
+# # continuous_processing()
+# =======
+continuous_processing()
 
-# continuous_processing()
