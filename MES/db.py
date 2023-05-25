@@ -234,6 +234,14 @@ def update_order_status(order, new_status):
     mydb.commit()
     return 0
 
+def update_order_penalties(order, new_pen):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "UPDATE orders SET penalties = '{}' WHERE id = '{}';".format(new_pen, order)
+    mycursor.execute(query)
+    mydb.commit()
+    return 0
 
 def update_order_cost(order, cost):
     connect_to_database()

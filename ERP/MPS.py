@@ -253,7 +253,7 @@ def process_working_orders(orders, day):
 
 def process_completed_orders(orders, day):
     completed_orders = []
-
+    pen = 0
     # Get the orders with the same due date as the current day
     due_orders = [order for order in orders if order[5] <= day]
     # Check the stock for each due order
@@ -261,6 +261,9 @@ def process_completed_orders(orders, day):
         order_id = order[0]
         workpiece = order[3]
         quantity = order[4]
+        duedate = order[5]
+        late_pen = order[6]
+        early_pen = order[7]
 
         # Check if the requested workpiece is in stock and in the correct quantity
         if database.get_warehouse(workpiece) >= quantity:
@@ -272,6 +275,15 @@ def process_completed_orders(orders, day):
 
             # Create the tuple and append it to the completed orders list
             completed_orders.append(f"{workpiece}_on_{dock_number}")
+            if duedate == day:
+                pen = 0;
+                database.update_order_penalties(order_id,pen)
+            elif duedate < day:
+                pen = late_pen * (day-duedate)
+                database.update_order_penalties(order_id, pen)
+            elif duedate > day:
+                pen = early_pen * (duedate-day)
+                database.update_order_penalties(order_id, pen)
 
     # Fill the remaining positions with "null" if there aren't enough pieces
     remaining_positions = 8 - len(completed_orders)
