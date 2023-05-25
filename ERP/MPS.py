@@ -255,7 +255,7 @@ def process_completed_orders(orders, day):
     completed_orders = []
 
     # Get the orders with the same due date as the current day
-    due_orders = [order for order in orders if order[5] == day]
+    due_orders = [order for order in orders if order[5] >= day]
     # Check the stock for each due order
     for order in due_orders:
         order_id = order[0]
