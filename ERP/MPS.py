@@ -379,7 +379,7 @@ def continuous_processing():
 def calculo_de_custos(purchasing_plan):
     custofinal = 0
     for workpiece_type, supplier_data in purchasing_plan.items():
-        quant = 0
+
         if workpiece_type in ["P1"]:
             if supplier_data['Supplier'] in ["Supplier A"]:
                 quant = supplier_data['Quantity']
