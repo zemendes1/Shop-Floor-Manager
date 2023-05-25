@@ -6,7 +6,9 @@ from MES import db
 
 
 def execute_xml():
-    receive_xml.run_xml()
+    while True:
+        receive_xml.run_xml()
+        print("teste")
 
 
 def execute_interface():
@@ -14,7 +16,8 @@ def execute_interface():
 
 
 def execute_mps():
-    MPS.continuous_processing()
+    while True:
+        MPS.continuous_processing()
 
 
 if __name__ == '__main__':
