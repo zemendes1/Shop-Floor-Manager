@@ -200,6 +200,15 @@ def update_order_status(order, new_status):
     mydb.commit()
     return 0
 
+def update_order_cost(order, cost):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "UPDATE orders SET custo = '{}' WHERE id = '{}';".format(cost, order)
+    mycursor.execute(query)
+    mydb.commit()
+    return 0
+
 
 def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving):
     connect_to_database()

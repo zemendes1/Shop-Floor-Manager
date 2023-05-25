@@ -150,7 +150,7 @@ def generate_purchasing_plan(orders, suppliers):
     for order in orders:
         workpiece_type = order[3]
         quantity = order[4]
-
+        order_id = order[0]
         # Determine the appropriate workpiece type to order based on the given workpiece type
         if workpiece_type in ["P6", "P8"]:
             required_workpiece_type = "P1"
@@ -181,6 +181,7 @@ def generate_purchasing_plan(orders, suppliers):
         # Add the supplier information to the purchasing plan
         if selected_supplier is not None:
             purchasing_plan[workpiece_type] = {
+                "OrderID": order_id,
                 "Supplier": selected_supplier.name,
                 "Quantity": quantity
             }
@@ -294,7 +295,6 @@ def process_completed_orders(orders, day):
 
 def continuous_processing(suppliers):
     while True:
-
         l = len(database.get_order_status("IN_PROGRESS"))
         i = len(database.get_order_status("TBD"))
         while l==0 and i ==0:
@@ -312,6 +312,8 @@ def continuous_processing(suppliers):
             non_ordered_orders = database.get_order_status("TBD")
             orders = sorted(non_ordered_orders, key=lambda x: x[5])
             tbd = True
+        supplier1_time = 0
+        supplier2_time = 0
 
         # Generate the purchasing plan for the day
         if tbd == True:
@@ -320,8 +322,30 @@ def continuous_processing(suppliers):
         mps = generate_mps(orders, day, purchasing_plan)
         # Separate the quantities of P1 and P2 from the purchasing plan
         p1_tobuy = purchasing_plan.get("P1", {}).get("Quantity", 0)
-        p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
+        p1_supplier = purchasing_plan.get("P1", {}).get("Supplier", 0)
 
+        p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
+        p2_supplier = purchasing_plan.get("P2", {}).get("Supplier", 0)
+        print(p1_supplier)
+        print(p2_supplier)
+
+        custo_final = calculo_de_custos(purchasing_plan)
+        pen = penalty_calc(mps, orders)
+        for order in orders:
+            print(order[10])
+
+        if p1_supplier == "Supplier A":
+            supplier1_time = 4
+        elif p1_supplier == "Supplier B":
+            supplier1_time = 2
+        elif p1_supplier == "Supplier C":
+            supplier1_time = 1
+        if p2_supplier == "Supplier A":
+            supplier2_time = 4
+        elif p2_supplier == "Supplier B":
+            supplier2_time = 2
+        elif p2_supplier == "Supplier C":
+            supplier2_time = 1
         # Generate the master production schedule for the day
         working_orders = process_working_orders(orders,day)
         print(working_orders)
@@ -331,12 +355,12 @@ def continuous_processing(suppliers):
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
         delivery_orders = ', '.join(delivery_orders)
-        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy)
+        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy,supplier1_time,supplier2_time)
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
-              f"the following delivery_orders{delivery_orders}, and the amount of P1 and P2 to buy respectively {p1_tobuy},{p2_tobuy}")
+              f"the following delivery_orders{delivery_orders}. The amount of P1 and P2 to buy are respectively {p1_tobuy},{p2_tobuy},"
+              f" which will be delivered in {supplier1_time} days and in {supplier2_time} days")
         # Wait for 60 seconds before processing the next day
-        custo_final = calculo_de_custos(purchasing_plan)
-        pen = penalty_calc(mps, orders)
+
         print("Penalties:")
         print(pen)
         print("Custo:")
@@ -354,22 +378,28 @@ def calculo_de_custos(purchasing_plan):
         if workpiece_type in ["P1"]:
             if supplier_data['Supplier'] in ["Supplier A"]:
                 quant = supplier_data['Quantity']
+                database.update_order_cost(supplier_data["OrderID"],quant*30)
                 custofinal = custofinal + quant*30
             elif supplier_data['Supplier'] in ["Supplier B"]:
                 quant = supplier_data['Quantity']
+                database.update_order_cost(supplier_data["OrderID"], quant * 45)
                 custofinal = custofinal + quant * 45
             elif supplier_data['Supplier'] in ["Supplier C"]:
                 quant = supplier_data['Quantity']
+                database.update_order_cost(supplier_data["OrderID"], quant * 55)
                 custofinal = custofinal + quant * 55
         elif workpiece_type in ["P2"]:
             if supplier_data['Supplier'] in ["Supplier A"]:
                 quant = supplier_data['Quantity']
+                database.update_order_cost(supplier_data["OrderID"], quant * 10)
                 custofinal = custofinal + quant*10
             elif supplier_data['Supplier'] in ["Supplier B"]:
                 quant = supplier_data['Quantity']
+                database.update_order_cost(supplier_data["OrderID"], quant * 15)
                 custofinal = custofinal + quant * 15
             elif supplier_data['Supplier'] in ["Supplier C"]:
                 quant = supplier_data['Quantity']
+                database.update_order_cost(supplier_data["OrderID"], quant * 18)
                 custofinal = custofinal + quant * 18
 
     return custofinal
