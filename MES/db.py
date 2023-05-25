@@ -11,6 +11,8 @@ def connect_to_database():
         mydb = None
 
     mydb = psycopg2.connect(
+        # Uncomment the following line to use a local database
+        # host="localhost",
         host="db.fe.up.pt",
         user="up201906869",
         password="infi2023",
@@ -200,6 +202,7 @@ def update_order_status(order, new_status):
     mydb.commit()
     return 0
 
+
 def update_order_cost(order, cost):
     connect_to_database()
     mycursor = mydb.cursor()
@@ -210,7 +213,7 @@ def update_order_cost(order, cost):
     return 0
 
 
-def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving):
+def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_arriving, p2_arriving):
     connect_to_database()
     mycursor = mydb.cursor()
 
@@ -227,7 +230,7 @@ def add_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1
         new_plan = "INSERT INTO dailyplan" \
                    " (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving)" \
                    " VALUES (%s, %s, %s, %s, %s, %s, %s)"
-        values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving)
+        values = (date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_arriving, p2_arriving)
         mycursor.execute(new_plan, values)
         mydb.commit()
     return 0
@@ -250,14 +253,14 @@ def get_daily_plan(date):
     return daily_plan_values
 
 
-def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_Arriving, p2_Arriving):
+def update_daily_plan(date, working_orders, delivery_orders, p1_tobuy, p2_tobuy, p1_arriving, p2_arriving):
     connect_to_database()
     mycursor = mydb.cursor()
 
     update_plan = "UPDATE dailyplan SET working_orders = '{}', delivery_orders = '{}'" \
                   ", p1_tobuy = {}, p2_tobuy = {}" \
                   " WHERE date = '{}';".format(working_orders, delivery_orders, p1_tobuy,
-                                               p2_tobuy, p1_Arriving, p2_Arriving, date)
+                                               p2_tobuy, p1_arriving, p2_arriving, date)
     mycursor.execute(update_plan)
     mydb.commit()
     return 0
