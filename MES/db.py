@@ -192,6 +192,7 @@ def get_order_status(status_of_order):
     else:
         return 'ERROR'
 
+
 def get_order_path(caminho):
     connect_to_database()
     mycursor = mydb.cursor()
@@ -673,4 +674,4 @@ def db_startup():
     add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
     erase_order_status()
 
-    db.insert_or_update_time(0)
+    insert_or_update_time(0)
