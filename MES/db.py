@@ -438,7 +438,8 @@ def insert_or_update_time(elapsed_time):
         MILLISECONDS_PER_DAY = 60 * 1000
         # Calculate the number of days
         current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
-
+        if elapsed_time == 0:
+            current_day = 0
         if existing_row:
             # update existing row with new day and time_elapsed values
             mycursor.execute(
