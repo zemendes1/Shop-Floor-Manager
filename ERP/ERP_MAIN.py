@@ -11,7 +11,7 @@ def execute_interface():
 
 def execute_everything_else():
     while True:
-        pass
+
         MPS.continuous_processing()
         receive_xml.run_xml()
 
