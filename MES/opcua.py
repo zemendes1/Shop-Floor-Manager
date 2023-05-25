@@ -16,7 +16,6 @@ async def main():
     # Get daily Plan
     current_day = db.get_day()
     daily_plan = db.get_daily_plan(current_day)
-    print(db.get_day())
     if daily_plan is not None:
         get_date, get_working_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy = daily_plan
 
