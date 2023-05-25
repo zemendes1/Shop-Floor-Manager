@@ -106,13 +106,13 @@ def create_table(_table):
                         "P9 INT CHECK (P9 >= 0)" \
                         ");"
     elif _table == "docks_total":
-        create_script = "CREATE VIEW docks_total AS SELECT " \
+        create_script = "CREATE OR REPLACE VIEW docks_total AS SELECT " \
                         "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
                         "FROM docks;"
 
     elif _table == "current_order_list":
-        create_script = "CREATE VIEW in_progress_view AS SELECT id, client, ordernumber, workpiece, quantity," \
-                        " duedate, late_penalty, early_penalty, path, status " \
+        create_script = "CREATE OR REPLACE VIEW in_progress_view AS SELECT id, client, ordernumber, workpiece," \
+                        " quantity, duedate, late_penalty, early_penalty, path, status " \
                         "FROM orders WHERE status = 'IN_PROGRESS';"
 
     mycursor.execute(create_script)
