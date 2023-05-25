@@ -47,7 +47,8 @@ def convert_string_order(input_str):
         "Late_Penalty": str(values[6]),
         "Early_Penalty": str(values[7]),
         "path": str(values[8]),
-        "status": str(values[9])
+        "status": str(values[9]),
+        "custo": str(values[10])
     }
     return result
 
@@ -107,7 +108,9 @@ def convert_string_daily_plan(input_str):
         "Working_orders": str(values[1]),
         "Delivery_orders": str(values[2]),
         "P1_toBuy": str(values[3]),
-        "P2_toBuy": str(values[4])
+        "P2_toBuy": str(values[4]),
+        "P1_Arriving ": str(values[5]),
+        "P2_Arriving ": str(values[6])
     }
     return result
 
