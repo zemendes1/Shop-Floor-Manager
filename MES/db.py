@@ -225,6 +225,7 @@ def update_order_cost(order, cost):
     mydb.commit()
     return 0
 
+
 def update_order_path(order, caminho):
     connect_to_database()
     mycursor = mydb.cursor()
@@ -671,3 +672,5 @@ def db_startup():
     erase_warehouse()
     add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
     erase_order_status()
+
+    db.insert_or_update_time(0)
