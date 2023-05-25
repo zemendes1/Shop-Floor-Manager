@@ -178,6 +178,7 @@ def get_order(id_order):
         mydb.commit()
     return order_values
 
+
 def get_order_status_table(id_order):
     connect_to_database()
     mycursor = mydb.cursor()
@@ -193,7 +194,6 @@ def get_order_status_table(id_order):
         order_values = mycursor.fetchone()
         mydb.commit()
     return order_values
-
 
 
 def get_order_status(status_of_order):
