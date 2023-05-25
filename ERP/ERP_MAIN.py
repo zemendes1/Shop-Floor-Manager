@@ -6,7 +6,7 @@ from ERP import receive_xml
 
 
 def execute_interface():
-    # interfaceErp.setup_interface()
+    interfaceErp.setup_interface()
     pass
 
 

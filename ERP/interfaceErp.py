@@ -138,14 +138,17 @@ class Ui_MainWindow(object):
 
         self.loaddata()
         self.timer = QTimer()
+        print(1)
         self.timer.timeout.connect(self.updateMode)
         self.timer.start(5000)
 
     def updateMode(self):
+
         self.tableWidget.setRowCount(0)
         self.tableWidget_2.setRowCount(0)
         self.loaddata()
         self.SetDATA()
+
 
 
     def loaddata(self):
@@ -180,7 +183,9 @@ class Ui_MainWindow(object):
 
 
     def SetDATA(self):
-        self.CurrentDate.setText(db.get_day())
+        aux = db.get_day()
+        DayString = str(aux)
+        self.CurrentDate.setText(DayString)
 
 
 
