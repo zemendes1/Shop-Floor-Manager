@@ -78,7 +78,7 @@
     </column>
     <column>
      <property name="text">
-      <string>Path</string>
+      <string>Purchase_Status</string>
      </property>
     </column>
     <column>
@@ -110,7 +110,7 @@
      <rect>
       <x>10</x>
       <y>390</y>
-      <width>881</width>
+      <width>1101</width>
       <height>291</height>
      </rect>
     </property>
@@ -153,7 +153,7 @@
    <widget class="QLabel" name="label_6">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>1130</x>
       <y>390</y>
       <width>131</width>
       <height>31</height>
@@ -166,7 +166,7 @@
    <widget class="QLabel" name="CurrentDate">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>1130</x>
       <y>430</y>
       <width>55</width>
       <height>16</height>
@@ -179,7 +179,7 @@
    <widget class="QLabel" name="label_7">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>1130</x>
       <y>460</y>
       <width>131</width>
       <height>31</height>
@@ -192,7 +192,7 @@
    <widget class="QLabel" name="TotalCost">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>1130</x>
       <y>500</y>
       <width>55</width>
       <height>16</height>
@@ -205,7 +205,7 @@
    <widget class="QLabel" name="label_8">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>1130</x>
       <y>530</y>
       <width>131</width>
       <height>31</height>
@@ -218,7 +218,7 @@
    <widget class="QLabel" name="CurrentDate_6">
     <property name="geometry">
      <rect>
-      <x>920</x>
+      <x>1130</x>
       <y>570</y>
       <width>55</width>
       <height>16</height>
@@ -226,6 +226,19 @@
     </property>
     <property name="text">
      <string>TextLabel</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="resetButton">
+    <property name="geometry">
+     <rect>
+      <x>1140</x>
+      <y>650</y>
+      <width>171</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Reset Database</string>
     </property>
    </widget>
   </widget>
