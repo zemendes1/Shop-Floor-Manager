@@ -1,6 +1,7 @@
 import psycopg2
 import datetime
 import math
+import time as tm
 
 
 def connect_to_database():
@@ -95,7 +96,8 @@ def create_table(_table):
     elif _table == "day":
         create_script = "CREATE TABLE IF NOT EXISTS day (" \
                         "day INT not null," \
-                        "time_elapsed TIME NOT NULL, " \
+                        "time_elapsed TIME NOT NULL," \
+                        "begin_time numeric(18, 4) " \
                         ");"
     elif _table == "warehouse":
         create_script = "CREATE TABLE IF NOT EXISTS warehouse (" \
@@ -446,50 +448,6 @@ def reset_db():
     add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
 
-def convert_ms_to_postgre_time(ms):
-    delta = datetime.timedelta(milliseconds=ms)
-    microseconds = delta.microseconds
-    seconds = delta.seconds
-    minutes, seconds = divmod(seconds, 60)
-    hours, minutes = divmod(minutes, 60)
-    return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds:03d}"
-
-
-def insert_or_update_time(elapsed_time):
-    connect_to_database()
-    mycursor = mydb.cursor()
-
-    # check if row already exists for this day
-    try:
-        mycursor.execute("SELECT * FROM day")
-        existing_row = mycursor.fetchone()
-        # Define the number of milliseconds in a day
-        MILLISECONDS_PER_DAY = 60 * 1000
-        # Calculate the number of days
-        current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
-        if elapsed_time == 0:
-            current_day = 0
-        if existing_row:
-            # update existing row with new day and time_elapsed values
-            mycursor.execute(
-                "UPDATE day SET day={}, time_elapsed='{}'".format(current_day,
-                                                                  convert_ms_to_postgre_time(elapsed_time)))
-            mydb.commit()
-        else:
-            try:
-                # insert new row with day and time_elapsed values
-                mycursor.execute("INSERT INTO day (day, time_elapsed) VALUES"
-                                 " ({}, '{}')".format(current_day, convert_ms_to_postgre_time(elapsed_time)))
-                mydb.commit()
-                # code that interacts with the database
-            except psycopg2.Error as e:
-                print("An error occurred:", str(e))
-
-    # code that interacts with the database
-    except psycopg2.Error as e:
-        print("An error occurred:", str(e))
-
-
 def get_day():
     connect_to_database()
     mycursor = mydb.cursor()
@@ -678,6 +636,61 @@ def number_of_orders_stored():
     return number_of_orders[0]
 
 
+def erase_day():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "DELETE FROM day;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def convert_ms_to_postgre_time(ms):
+    delta = datetime.timedelta(milliseconds=ms)
+    microseconds = delta.microseconds
+    seconds = delta.seconds
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds:03d}"
+
+
+def insert_or_update_time(elapsed_time, begin_time):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    # check if row already exists for this day
+    try:
+        mycursor.execute("SELECT * FROM day")
+        existing_row = mycursor.fetchone()
+        # Define the number of milliseconds in a day
+        MILLISECONDS_PER_DAY = 60 * 1000
+        # Calculate the number of days
+        current_day = math.ceil(elapsed_time / MILLISECONDS_PER_DAY) - 1
+        if elapsed_time == 0:
+            current_day = 0
+        if existing_row:
+            # update existing row with new day and time_elapsed values
+            mycursor.execute(
+                "UPDATE day SET day={}, time_elapsed='{}', begin_time='{}'".format(current_day,
+                                                                                   convert_ms_to_postgre_time(
+                                                                                       elapsed_time), begin_time))
+            mydb.commit()
+        else:
+            try:
+                # insert new row with day and time_elapsed values
+                mycursor.execute("INSERT INTO day (day, time_elapsed, begin_time) VALUES"
+                                 " ({}, '{}', '{}')".format(current_day, convert_ms_to_postgre_time(elapsed_time),
+                                                            begin_time))
+                mydb.commit()
+                # code that interacts with the database
+            except psycopg2.Error as e:
+                print("An error occurred:", str(e))
+
+    # code that interacts with the database
+    except psycopg2.Error as e:
+        print("An error occurred:", str(e))
+
+
 def db_startup():
     create_table("orders")
     create_table("dailyplan")
@@ -704,4 +717,18 @@ def db_startup():
     add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
     erase_order_status()
 
-    insert_or_update_time(0)
+    now_time = tm.time() * 1000.0
+    insert_or_update_time(0, now_time)
+
+
+def get_start_time():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "SELECT begin_time FROM day"
+    mycursor.execute(query)
+    start_time = mycursor.fetchone()
+    if start_time is not None:
+        return float(start_time[0])
+    else:
+        return 0
