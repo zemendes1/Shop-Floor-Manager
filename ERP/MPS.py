@@ -33,6 +33,10 @@ class Supplier:
 
     def production_time(self, workpiece_type):
         return self.delivery_time[workpiece_type]
+database.erase_orders()
+database.add_order(1,"TESTE",1,"P5",16,8,10,10,"{}","TBD",0,0)
+database.add_order(2,"TESTE1",2,"P6",8,8,10,10,"{}","TBD",0,0)
+database.add_order(3,"TESTE2",3,"P9",3,8,10,10,"{}","TBD",0,0)
 
 
 def generate_mps(orders, day, purchasing_plan):
@@ -326,6 +330,7 @@ def continuous_processing():
             purchasing_plan = generate_purchasing_plan(orders, suppliers)
             for order in P_orders:
                 database.update_order_path(order[0], 'Bought')
+                calculo_de_custos(P_orders,purchasing_plan)
 
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
@@ -336,7 +341,6 @@ def continuous_processing():
         p2_tobuy = purchasing_plan.get("P2", {}).get("Quantity", 0)
         p2_supplier = purchasing_plan.get("P2", {}).get("Supplier", 0)
 
-        custo_final = calculo_de_custos(purchasing_plan)
         pen = penalty_calc(mps, orders)
 
         if p1_supplier == "Supplier A":
@@ -368,46 +372,52 @@ def continuous_processing():
 
         print("Penalties:")
         print(pen)
-        print("Custo:")
-        print(custo_final)
         print("UPDATED")
+
         next_day = day + 1
         while day != next_day:
             day = database.get_day()
 
 
-def calculo_de_custos(purchasing_plan):
-    custofinal = 0
-    for workpiece_type, supplier_data in purchasing_plan.items():
+def calculo_de_custos(orders,purchasing_plan):
+    for order in orders:
+        # Extract order information
+        order_id = order[0]
+        workpiece = order[3]
+        quantity = order[4]  # Extract the quantity from the order
 
-        if workpiece_type in ["P1"]:
-            if supplier_data['Supplier'] in ["Supplier A"]:
-                quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"], quant * 30)
-                custofinal = custofinal + quant * 30
-            elif supplier_data['Supplier'] in ["Supplier B"]:
-                quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"], quant * 45)
-                custofinal = custofinal + quant * 45
-            elif supplier_data['Supplier'] in ["Supplier C"]:
-                quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"], quant * 55)
-                custofinal = custofinal + quant * 55
-        elif workpiece_type in ["P2"]:
-            if supplier_data['Supplier'] in ["Supplier A"]:
-                quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"], quant * 10)
-                custofinal = custofinal + quant * 10
-            elif supplier_data['Supplier'] in ["Supplier B"]:
-                quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"], quant * 15)
-                custofinal = custofinal + quant * 15
-            elif supplier_data['Supplier'] in ["Supplier C"]:
-                quant = supplier_data['Quantity']
-                database.update_order_cost(supplier_data["OrderID"], quant * 18)
-                custofinal = custofinal + quant * 18
+        # Determine which final products can be made from the ordered workpiece
+        if workpiece in ["P6", "P8"]:
+            required_workpiece_type = "P1"
+        elif workpiece in ["P3", "P4", "P5", "P7", "P9"]:
+            required_workpiece_type = "P2"
+        else:
+            # Skip this order if the workpiece is not valid
+            continue
 
-    return custofinal
+        # Determine the earliest possible start date for each final product based on supplier lead times
+        for workpiece_type, supplier_data in purchasing_plan.items():
+
+            if required_workpiece_type in ["P1"]:
+                if supplier_data['Supplier'] == "Supplier A":
+                    quant = quantity
+                    database.update_order_cost(order_id, quant * 30)
+                elif supplier_data['Supplier'] == "Supplier B":
+                    quant = quantity
+                    database.update_order_cost(order_id, quant * 45)
+                elif supplier_data['Supplier'] == "Supplier C":
+                    quant = quantity
+                    database.update_order_cost(order_id, quant * 55)
+            elif required_workpiece_type in ["P2"]:
+                if supplier_data['Supplier'] == "Supplier A":
+                    quant = quantity
+                    database.update_order_cost(order_id, quant * 10)
+                elif supplier_data['Supplier'] == "Supplier B":
+                    quant = quantity
+                    database.update_order_cost(order_id, quant * 15)
+                elif supplier_data['Supplier'] == "Supplier C":
+                    quant = quantity
+                    database.update_order_cost(order_id, quant * 18)
 
 
 def penalty_calc(mps, orders):
@@ -512,5 +522,7 @@ def penalty_calc(mps, orders):
 #
 # # continuous_processing()
 # =======
-#continuous_processing()
+continuous_processing()
+
+
 
