@@ -29,13 +29,14 @@ if __name__ == '__main__':
     db.create_table("day")
     db.create_table("warehouse")
     db.create_table("docks_total")
-    db.create_table("current_order_list")
+    db.create_table("facilities_total")
+    db.create_table("in_progress_view")
     # add this check and freeze_support() call
     multiprocessing.freeze_support()
 
     # create processes for each function
     process1 = multiprocessing.Process(target=execute_interface)
-    process2 = multiprocessing.Process(target=execute_everything_else, args=(start_time,))
+    process2 = multiprocessing.Process(target=execute_everything_else)
 
     # start the processes
     process1.start()

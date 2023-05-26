@@ -20,7 +20,17 @@ def execute_mps():
 
 
 if __name__ == '__main__':
-    db.db_startup()
+
+    db.create_table("orders")
+    db.create_table("order_status")
+    db.create_table("dailyplan")
+    db.create_table("facilities")
+    db.create_table("docks")
+    db.create_table("day")
+    db.create_table("warehouse")
+    db.create_table("docks_total")
+    db.create_table("facilities_total")
+
     # add this check and freeze_support() call
     multiprocessing.freeze_support()
 

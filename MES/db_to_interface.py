@@ -15,7 +15,9 @@ def convert_string_facilities(input_str):
         "P8": values[8],
         "P9": values[9],
         "workTime": values[10],
-        "Total": str(int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(values[7]) + int(values[8]) + int(values[9]))
+        "Total": str(
+            int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(
+                values[7]) + int(values[8]) + int(values[9]))
     }
     return result
 
@@ -82,13 +84,16 @@ def convert_string_dock(input_str):
         "P7": values[7],
         "P8": values[8],
         "P9": values[9],
-        "Total": str(int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(values[7]) + int(values[8]) + int(values[9]))
+        "Total": str(
+            int(values[1]) + int(values[2]) + int(values[3]) + int(values[4]) + int(values[5]) + int(values[6]) + int(
+                values[7]) + int(values[8]) + int(values[9]))
     }
     return result
 
-def order_status(id):
-    return_query = db.get_order_status_table(id)
-    if id is None:
+
+def order_status(identifier):
+    return_query = db.get_order_status_table(identifier)
+    if identifier is None:
         formatted_str = []
         for i in range(len(return_query)):
             if len(return_query) - i > 1:
@@ -99,6 +104,7 @@ def order_status(id):
     else:
         formatted_str = convert_string_order_status(return_query)
         return [formatted_str]
+
 
 def convert_string_order_status(input_str):
     values = list(input_str)
@@ -111,6 +117,8 @@ def convert_string_order_status(input_str):
         "total_production_time": str(values[5]),
     }
     return result
+
+
 def dock(num):
     return_query = db.get_dock(num)
     if num is None:

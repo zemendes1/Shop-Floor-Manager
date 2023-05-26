@@ -38,7 +38,7 @@ def create_table(_table):
                         "path varchar(200)," \
                         "status varchar(200) CHECK (status = 'TBD' OR status='DONE' OR status='IN_PROGRESS')NOT NULL," \
                         "custo INT, " \
-                        "penalties INT"\
+                        "penalties INT" \
                         ");"
     elif _table == "order_status":
         create_script = " CREATE TABLE IF NOT EXISTS order_status(" \
@@ -75,7 +75,7 @@ def create_table(_table):
                         "workTime TIME NOT NULL" \
                         ");"
     elif _table == "facilities_total":
-        create_script = "CREATE VIEW facilities_total AS SELECT " \
+        create_script = "CREATE OR REPLACE VIEW facilities_total AS SELECT " \
                         "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,workTime,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) " \
                         "AS Total " \
                         "FROM facilities;"
@@ -95,7 +95,7 @@ def create_table(_table):
     elif _table == "day":
         create_script = "CREATE TABLE IF NOT EXISTS day (" \
                         "day INT not null," \
-                        "time_elapsed TIME NOT NULL " \
+                        "time_elapsed TIME NOT NULL, " \
                         ");"
     elif _table == "warehouse":
         create_script = "CREATE TABLE IF NOT EXISTS warehouse (" \
@@ -119,8 +119,9 @@ def create_table(_table):
                         " quantity, duedate, late_penalty, early_penalty, path, status " \
                         "FROM orders WHERE status = 'IN_PROGRESS';"
 
-    mycursor.execute(create_script)
-    mydb.commit()
+    if create_script != "":
+        mycursor.execute(create_script)
+        mydb.commit()
 
 
 def add_order(id_order, client, ordernumber, workpiece, quantity, duedate,
@@ -234,6 +235,7 @@ def update_order_status(order, new_status):
     mydb.commit()
     return 0
 
+
 def update_order_penalties(order, new_pen):
     connect_to_database()
     mycursor = mydb.cursor()
@@ -242,6 +244,7 @@ def update_order_penalties(order, new_pen):
     mycursor.execute(query)
     mydb.commit()
     return 0
+
 
 def update_order_cost(order, cost):
     connect_to_database()
