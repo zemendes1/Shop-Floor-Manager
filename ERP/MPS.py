@@ -359,6 +359,7 @@ def continuous_processing():
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
         delivery_orders = ', '.join(delivery_orders)
+        working_orders = sort_string_by_index(working_orders)
         database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy, supplier1_time,
                                 supplier2_time)
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
