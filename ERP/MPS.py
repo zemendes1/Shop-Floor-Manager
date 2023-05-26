@@ -277,12 +277,12 @@ def process_completed_orders(orders, day):
             completed_orders.append(f"{workpiece}_on_{dock_number}")
             if duedate == day:
                 pen = 0;
-                database.update_order_penalties(order_id,pen)
+                database.update_order_penalties(order_id, pen)
             elif duedate < day:
-                pen = late_pen * (day-duedate)
+                pen = late_pen * (day - duedate)
                 database.update_order_penalties(order_id, pen)
             elif duedate > day:
-                pen = early_pen * (duedate-day)
+                pen = early_pen * (duedate - day)
                 database.update_order_penalties(order_id, pen)
 
     # Fill the remaining positions with "null" if there aren't enough pieces
@@ -326,7 +326,7 @@ def continuous_processing():
             purchasing_plan = generate_purchasing_plan(orders, suppliers)
             for order in P_orders:
                 database.update_order_path(order[0], 'Bought')
-                calculo_de_custos(P_orders,purchasing_plan)
+                calculo_de_custos(P_orders, purchasing_plan)
 
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
@@ -375,7 +375,7 @@ def continuous_processing():
             day = database.get_day()
 
 
-def calculo_de_custos(orders,purchasing_plan):
+def calculo_de_custos(orders, purchasing_plan):
     for order in orders:
         # Extract order information
         order_id = order[0]
@@ -472,6 +472,34 @@ def penalty_calc(mps, orders):
 
     return pen
 
+
+def sort_string_by_index(string):
+    if string is None:
+        return None
+
+    mappings = {
+        'P3_from_P2': 40,
+        'P4_from_P2': 40,
+        'P5_from_P9': 45,
+        'P6_from_P1': 40,
+        'P6_from_P3': 50,
+        'P7_from_P4': 40,
+        'P8_from_P6': 90,
+        'P9_from_P7': 40,
+        None: -1  # null is assigned the lowest index
+    }
+
+    # Split the string into individual elements
+    elements = string.split(', ')
+
+    # Sort the elements based on their indexes
+    sorted_elements = sorted(elements, key=lambda x: mappings[x.strip()])
+
+    # Join the sorted elements back into a string
+    sorted_string = ', '.join(sorted_elements)
+
+    return sorted_string
+
 # day = database.get_day()
 # stock = database.get_warehouse(None)
 # purchasing_plan = generate_purchasing_plan(orders, suppliers)
@@ -505,7 +533,6 @@ def penalty_calc(mps, orders):
 #
 
 
-
 # suppliers = [
 #     Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
 #     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
@@ -518,7 +545,3 @@ def penalty_calc(mps, orders):
 #
 # # continuous_processing()
 # =======
-
-
-
-
