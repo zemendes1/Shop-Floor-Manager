@@ -205,6 +205,7 @@ class Ui_MainWindow(object):
         rowOrder = 0
         rowDailyPlan = 0
         CustoAux = 0
+        penAux = 0
 
         self.tableWidget.setRowCount(len(testeOrder))
         self.tableWidget_2.setRowCount(len(testeDailyPlan))
@@ -222,10 +223,14 @@ class Ui_MainWindow(object):
             self.tableWidget.setItem(rowOrder, 9, QtWidgets.QTableWidgetItem(order["status"]))
             self.tableWidget.setItem(rowOrder, 10, QtWidgets.QTableWidgetItem(order["custo"]))
             self.tableWidget.setItem(rowOrder, 11, QtWidgets.QTableWidgetItem(order["penalties"]))
+            pen = int(order["penalties"])
             cust = int(order["custo"])
+            penAux = penAux + pen
             CustoAux = CustoAux + cust
             rowOrder = rowOrder + 1
+        PenStr = str(penAux)
         CustoStr = str(CustoAux)
+        self.CurrentDate_6.setText(PenStr)
         self.TotalCost.setText(CustoStr)
 
         for DailyPlan in testeDailyPlan:
