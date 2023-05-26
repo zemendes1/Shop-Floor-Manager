@@ -360,6 +360,7 @@ def continuous_processing():
         working_orders = ', '.join(working_orders)
         delivery_orders = ', '.join(delivery_orders)
         working_orders = sort_string_by_index(working_orders)
+
         database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy, supplier1_time,
                                 supplier2_time)
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
@@ -490,7 +491,7 @@ def sort_string_by_index(string):
         'P7_from_P4': 40,
         'P8_from_P6': 90,
         'P9_from_P7': 40,
-        None: -1  # null is assigned the lowest index
+        'null': -1  # null is assigned the lowest index  # null is assigned the lowest index
     }
 
     # Split the string into individual elements
