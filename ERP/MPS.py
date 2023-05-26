@@ -33,10 +33,6 @@ class Supplier:
 
     def production_time(self, workpiece_type):
         return self.delivery_time[workpiece_type]
-database.erase_orders()
-database.add_order(1,"TESTE",1,"P5",16,8,10,10,"{}","TBD",0,0)
-database.add_order(2,"TESTE1",2,"P6",8,8,10,10,"{}","TBD",0,0)
-database.add_order(3,"TESTE2",3,"P9",3,8,10,10,"{}","TBD",0,0)
 
 
 def generate_mps(orders, day, purchasing_plan):
@@ -522,7 +518,7 @@ def penalty_calc(mps, orders):
 #
 # # continuous_processing()
 # =======
-continuous_processing()
+
 
 
 
