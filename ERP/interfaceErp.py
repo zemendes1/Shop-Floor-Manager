@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         item = self.tableWidget_2.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "Date"))
         item = self.tableWidget_2.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Purchase_orders"))
+        item.setText(_translate("MainWindow", "Working_orders"))
         item = self.tableWidget_2.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "Delivery_orders"))
         item = self.tableWidget_2.horizontalHeaderItem(3)
