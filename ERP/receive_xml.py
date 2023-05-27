@@ -9,6 +9,12 @@ class Xml:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind((identificador, port))
 
+        # Instruções de Apresentação
+        # self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # self.sock.bind(('', 4321))  # binds to all interfaces (insecure)
+        # OR
+        # self.sock.bind(('0.0.0.0', 4321)) # binds to all interfaces (insecure)
+
         self.buffer = 1024
         self.format = "utf-8"
         self.i = 0
@@ -59,12 +65,8 @@ class Xml:
 
 def run_xml():
     xml = Xml("127.0.0.1", 54321)
-    # while True:
     xml.xml2string()
     nameID, number, workpiece, quantity, duedate, latepen, earlypen = xml.get_order()
     for i in range(len(number)):
         MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
                          earlypen[i], '{}', 'TBD', 0, 0)
-# TBD, IN_PROGRESS , DONE
-
-# run_xml()
