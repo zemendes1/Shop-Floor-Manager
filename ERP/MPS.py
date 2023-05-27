@@ -489,7 +489,7 @@ def sort_string_by_index(string):
         'P6_from_P1': 40,
         'P6_from_P3': 50,
         'P7_from_P4': 40,
-        'P8_from_P6': 90,
+        'P8_from_P6': 60,
         'P9_from_P7': 40,
         'null': -1  # null is assigned the lowest index
     }
