@@ -111,6 +111,18 @@ def create_table(_table):
                         "P8 INT CHECK (P8 >= 0)," \
                         "P9 INT CHECK (P9 >= 0)" \
                         ");"
+    elif _table == "unloaded":
+        create_script = "CREATE TABLE IF NOT EXISTS unloaded (" \
+                        "P1 INT CHECK (P1 >= 0)," \
+                        "P2 INT CHECK (P2 >= 0)," \
+                        "P3 INT CHECK (P3 >= 0)," \
+                        "P4 INT CHECK (P4 >= 0)," \
+                        "P5 INT CHECK (P5 >= 0)," \
+                        "P6 INT CHECK (P6 >= 0)," \
+                        "P7 INT CHECK (P7 >= 0)," \
+                        "P8 INT CHECK (P8 >= 0)," \
+                        "P9 INT CHECK (P9 >= 0)" \
+                        ");"
     elif _table == "docks_total":
         create_script = "CREATE OR REPLACE VIEW docks_total AS SELECT " \
                         "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
@@ -430,24 +442,6 @@ def get_dock(num):
     return dock_values
 
 
-def reset_db():
-    connect_to_database()
-    mycursor = mydb.cursor()
-
-    query = "DELETE FROM docks; DELETE FROM facilities; DELETE FROM orders; DELETE FROM dailyplan;" \
-            "DELETE FROM order_status; DELETE FROM day; DELETE FROM warehouse;"
-    mycursor.execute(query)
-    mydb.commit()
-
-    add_facility(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    add_facility(2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    add_facility(3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    add_facility(4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-    add_dock(1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    add_dock(2, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-
 def get_day():
     connect_to_database()
     mycursor = mydb.cursor()
@@ -502,6 +496,47 @@ def get_warehouse(text):
         return warehouse_values[0]
 
 
+def add_unloaded(p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    connect_to_database()
+    mycursor = mydb.cursor()
+    new_unloaded = "INSERT INTO unloaded" \
+                   " (p1, p2, p3, p4, p5, p6, p7, p8, p9)" \
+                   " VALUES ( {}, {}, {}, {}, {}, {}, {}, {}, {});".format(p1, p2, p3, p4, p5, p6, p7, p8, p9)
+    mycursor.execute(new_unloaded)
+    mydb.commit()
+    return 0
+
+
+def update_unloaded(p1, p2, p3, p4, p5, p6, p7, p8, p9):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    update_query = "UPDATE unloaded SET" \
+                   " p1={}, p2={}, p3={}, p4={}, p5={}, p6={}, p7={}, p8={}, p9={}".format(p1, p2, p3, p4, p5,
+                                                                                           p6, p7, p8, p9)
+    mycursor.execute(update_query)
+    mydb.commit()
+    return 0
+
+
+def get_unloaded(text):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    if text is None:
+        query = "SELECT * FROM unloaded"
+        mycursor.execute(query)
+        unloaded_values = mycursor.fetchall()
+        mydb.commit()
+        return unloaded_values[0]
+    else:
+        query = "SELECT {} FROM unloaded ".format(str(text))
+        mycursor.execute(query)
+        unloaded_values = mycursor.fetchone()
+        mydb.commit()
+        return unloaded_values[0]
+
+
 def erase_docks():
     connect_to_database()
     mycursor = mydb.cursor()
@@ -552,6 +587,15 @@ def erase_warehouse():
     mycursor = mydb.cursor()
 
     query = "DELETE FROM warehouse;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
+def erase_unloaded():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "DELETE FROM unloaded;"
     mycursor.execute(query)
     mydb.commit()
 
@@ -698,6 +742,7 @@ def db_startup():
     create_table("docks")
     create_table("day")
     create_table("warehouse")
+    create_table("unloaded")
 
     erase_orders()
 
@@ -715,6 +760,9 @@ def db_startup():
 
     erase_warehouse()
     add_warehouse(0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    erase_unloaded()
+    add_unloaded(0, 0, 0, 0, 0, 0, 0, 0, 0)
     erase_order_status()
 
     now_time = tm.time() * 1000.0
