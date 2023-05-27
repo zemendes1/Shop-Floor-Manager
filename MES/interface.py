@@ -372,7 +372,7 @@ class Ui_MainWindow(object):
         testeDailyPlan = db_to_interface.daily_plan(None)
         testeFacilities = db_to_interface.facilities(None)
         testeDocks = db_to_interface.dock(None)
-        testeWarehouse = db_to_interface.warehouse(None)
+        testeUnloaded = db_to_interface.unloaded()
 
         rowOrderStatus = 0
         rowDailyPlan = 0
@@ -383,7 +383,7 @@ class Ui_MainWindow(object):
         self.tableWidget_4.setRowCount((len(testeDocks)))
         self.tableWidget.setRowCount(len(testeOrderStatus))
         self.tableWidget_2.setRowCount(len(testeDailyPlan))
-        self.tableWidget_5.setRowCount((len(testeWarehouse)))
+        self.tableWidget_5.setRowCount((len(testeUnloaded)))
         for order in testeOrderStatus:
             self.tableWidget.setItem(rowOrderStatus, 0, QtWidgets.QTableWidgetItem(order["id"]))
             self.tableWidget.setItem(rowOrderStatus, 1, QtWidgets.QTableWidgetItem(order["ordernumber"]))
@@ -430,7 +430,7 @@ class Ui_MainWindow(object):
             self.tableWidget_4.setItem(rowDocks, 10, QtWidgets.QTableWidgetItem(Docks["Total"]))
             rowDocks = rowDocks + 1
 
-        for Warehouse in testeWarehouse:
+        for Warehouse in testeUnloaded:
             self.tableWidget_5.setItem(rowWarehouse, 0, QtWidgets.QTableWidgetItem(Warehouse["P1"]))
             self.tableWidget_5.setItem(rowWarehouse, 1, QtWidgets.QTableWidgetItem(Warehouse["P2"]))
             self.tableWidget_5.setItem(rowWarehouse, 2, QtWidgets.QTableWidgetItem(Warehouse["P3"]))

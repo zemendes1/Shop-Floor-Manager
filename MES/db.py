@@ -487,13 +487,13 @@ def get_warehouse(text):
         mycursor.execute(query)
         warehouse_values = mycursor.fetchall()
         mydb.commit()
-        return warehouse_values
+        return warehouse_values[0]
     else:
         query = "SELECT {} FROM warehouse ".format(str(text))
         mycursor.execute(query)
         warehouse_values = mycursor.fetchone()
         mydb.commit()
-        return warehouse_values
+        return warehouse_values[0]
 
 
 def add_unloaded(p1, p2, p3, p4, p5, p6, p7, p8, p9):
@@ -519,22 +519,15 @@ def update_unloaded(p1, p2, p3, p4, p5, p6, p7, p8, p9):
     return 0
 
 
-def get_unloaded(text):
+def get_unloaded():
     connect_to_database()
     mycursor = mydb.cursor()
 
-    if text is None:
-        query = "SELECT * FROM unloaded"
-        mycursor.execute(query)
-        unloaded_values = mycursor.fetchall()
-        mydb.commit()
-        return unloaded_values[0]
-    else:
-        query = "SELECT {} FROM unloaded ".format(str(text))
-        mycursor.execute(query)
-        unloaded_values = mycursor.fetchone()
-        mydb.commit()
-        return unloaded_values[0]
+    query = "SELECT * FROM unloaded"
+    mycursor.execute(query)
+    unloaded_values = mycursor.fetchall()
+    mydb.commit()
+    return unloaded_values[0]
 
 
 def erase_docks():

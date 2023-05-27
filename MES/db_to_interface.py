@@ -36,7 +36,9 @@ def facilities(day):
         formatted_str = convert_string_facilities(return_query)
         return [formatted_str]
 
-def convert_string_warehouse(input_str):
+
+def convert_string_unloaded(input_str):
+
     values = list(map(str, input_str))
     result = {
         "P1": values[0],
@@ -55,19 +57,10 @@ def convert_string_warehouse(input_str):
     return result
 
 
-def warehouse(text):
-    return_query = db.get_warehouse(text)
-    if text is None:
-        formatted_str = []
-        for i in range(len(return_query)):
-            if len(return_query) - i > 1:
-                formatted_str.append(convert_string_warehouse(return_query[i]))
-            else:
-                formatted_str.append(convert_string_warehouse(return_query[i]))
-        return formatted_str
-    else:
-        formatted_str = convert_string_warehouse(return_query)
-        return [formatted_str]
+def unloaded():
+    return_query = db.get_unloaded()
+    formatted_str = convert_string_unloaded(return_query)
+    return [formatted_str]
 
 
 def convert_string_order(input_str):
