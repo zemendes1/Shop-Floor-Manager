@@ -17,14 +17,14 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
+      <x>-10</x>
+      <y>10</y>
       <width>1331</width>
       <height>781</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="Orders">
      <attribute name="title">
@@ -161,7 +161,7 @@
         <x>20</x>
         <y>50</y>
         <width>1081</width>
-        <height>291</height>
+        <height>201</height>
        </rect>
       </property>
       <property name="layoutDirection">
@@ -235,7 +235,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>350</y>
+        <y>260</y>
         <width>141</width>
         <height>31</height>
        </rect>
@@ -248,9 +248,9 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>390</y>
+        <y>290</y>
         <width>1081</width>
-        <height>321</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -259,6 +259,11 @@
       <column>
        <property name="text">
         <string>num</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P1</string>
        </property>
       </column>
       <column>
@@ -352,6 +357,87 @@
       <property name="text">
        <string>Reset Database</string>
       </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>470</y>
+        <width>161</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline;&quot;&gt;Table: Unloaded&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tableWidget_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>500</y>
+        <width>1081</width>
+        <height>171</height>
+       </rect>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <column>
+       <property name="text">
+        <string>num</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P2</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P3</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P4</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P5</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P6</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P7</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P8</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P9</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Total</string>
+       </property>
+      </column>
      </widget>
     </widget>
    </widget>

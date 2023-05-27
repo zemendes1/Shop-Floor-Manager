@@ -483,17 +483,17 @@ def get_warehouse(text):
     mycursor = mydb.cursor()
 
     if text is None:
-        query = "SELECT * FROM warehouse"
+        query = "SELECT * FROM warehouse "
         mycursor.execute(query)
         warehouse_values = mycursor.fetchall()
         mydb.commit()
-        return warehouse_values[0]
+        return warehouse_values
     else:
         query = "SELECT {} FROM warehouse ".format(str(text))
         mycursor.execute(query)
         warehouse_values = mycursor.fetchone()
         mydb.commit()
-        return warehouse_values[0]
+        return warehouse_values
 
 
 def add_unloaded(p1, p2, p3, p4, p5, p6, p7, p8, p9):
