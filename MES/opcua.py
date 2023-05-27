@@ -38,6 +38,7 @@ async def main():
 
     machine_times = []
     pecas_armazem = []
+    unloaded = []
     machine_transforms = []
     for i in range(5):
         machine_transforms.append([0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -111,6 +112,15 @@ async def main():
             node = client.get_node(
                 "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.npecas_armazem[{}]".format(i))
             pecas_armazem.append(await node.read_value())
+
+        # Ler Peças do Unloaded Pieces
+        for i in range(1, 10):
+            node = client.get_node(
+                "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.pecas_entregues[{}]".format(i))
+            unloaded.append(await node.read_value())
+
+        db.update_unloaded(unloaded[0], unloaded[1], unloaded[2], unloaded[3], unloaded[4],
+                           unloaded[5], unloaded[6], unloaded[7], unloaded[8])
 
         db.update_warehouse(pecas_armazem[0], pecas_armazem[1], pecas_armazem[2], pecas_armazem[3], pecas_armazem[4],
                             pecas_armazem[5], pecas_armazem[6], pecas_armazem[7], pecas_armazem[8])
