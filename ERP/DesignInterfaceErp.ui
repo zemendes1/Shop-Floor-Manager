@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>Erp Interface</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(181, 214, 255);</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label">
     <property name="geometry">
