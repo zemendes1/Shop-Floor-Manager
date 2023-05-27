@@ -491,20 +491,19 @@ def sort_string_by_index(string):
         'P7_from_P4': 40,
         'P8_from_P6': 90,
         'P9_from_P7': 40,
-        'null': -1  # null is assigned the lowest index  # null is assigned the lowest index
+        'null': -1  # null is assigned the lowest index
     }
 
     # Split the string into individual elements
     elements = string.split(', ')
 
-    # Sort the elements based on their indexes
-    sorted_elements = sorted(elements, key=lambda x: mappings[x.strip()])
+    # Sort the elements based on their indexes in reverse order
+    sorted_elements = sorted(elements, key=lambda x: mappings[x.strip()], reverse=True)
 
     # Join the sorted elements back into a string
     sorted_string = ', '.join(sorted_elements)
 
     return sorted_string
-
 # day = database.get_day()
 # stock = database.get_warehouse(None)
 # purchasing_plan = generate_purchasing_plan(orders, suppliers)
