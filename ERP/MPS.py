@@ -3,9 +3,9 @@ import time
 
 
 class Order:
-    def __init__(self, id, client, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty,
+    def __init__(self, identifier, client, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty,
                  path, status):
-        self.id = id
+        self.id = identifier
         self.client = client
         self.order_number = order_number
         self.workpiece_type = workpiece_type
@@ -78,7 +78,8 @@ def generate_mps(orders, day, purchasing_plan):
             # Skip this order if the workpiece is not valid
             continue
 
-        supplier_delivery_time = 0;
+        supplier_delivery_time = 0
+        earliest_start_date = day
         # Determine the earliest possible start date for each final product based on supplier lead times
 
         for workpiece_type, supplier_data in purchasing_plan.items():
@@ -132,12 +133,14 @@ def generate_mps(orders, day, purchasing_plan):
 
 def generate_purchasing_plan(orders, suppliers):
     purchasing_plan = {}
+    required_workpiece_type = ""
+    workpiece_type = ""
 
     # Collect the quantities of required workpieces P1 and P2 from the orders
     for order in orders:
         workpiece_type = order[3]
         quantity = order[4]
-        order_id = order[0]
+
         # Determine the appropriate workpiece type to order based on the given workpiece type
         if workpiece_type in ["P6", "P8"]:
             required_workpiece_type = "P1"
@@ -168,7 +171,6 @@ def generate_purchasing_plan(orders, suppliers):
         # Add the supplier information to the purchasing plan
         if selected_supplier is not None:
             purchasing_plan[workpiece_type] = {
-                "OrderID": order_id,
                 "Supplier": selected_supplier.name,
                 "Quantity": quantity
             }
@@ -181,9 +183,8 @@ def generate_purchasing_plan(orders, suppliers):
     return purchasing_plan
 
 
-def process_working_orders(orders, day):
+def process_working_orders(orders):
     # Define the transformation times for each workpiece
-    order_schedules = []
     # Goal piece : transformation pieces, time
     transformation_times = {
         "P3": ("P2", 25),
@@ -202,15 +203,13 @@ def process_working_orders(orders, day):
     for order in orders:
 
         order_id = order[0]
-        due_date = order[1]
         quantity = order[4]
         desired_piece = order[3]  # Last transformed workpiece
-        status = order[9]
-        next_piece = None
 
         queue = []
         starting_workpiece = desired_piece
         next_piece = desired_piece
+        prev_next_piece = ""
         while starting_workpiece in transformation_times:
             prev_next_piece = next_piece
             val = transformation_times[starting_workpiece]
@@ -253,7 +252,6 @@ def process_working_orders(orders, day):
 
 def process_completed_orders(orders, day):
     completed_orders = []
-    pen = 0
     # Get the orders with the same due date as the current day
     due_orders = [order for order in orders if order[5] <= day]
     # Check the stock for each due order
@@ -276,13 +274,13 @@ def process_completed_orders(orders, day):
             # Create the tuple and append it to the completed orders list
             completed_orders.append(f"{workpiece}_on_{dock_number}")
             if duedate == day:
-                pen = 0;
-                database.update_order_penalties(order_id,pen)
+                pen = 0
+                database.update_order_penalties(order_id, pen)
             elif duedate < day:
-                pen = late_pen * (day-duedate)
+                pen = late_pen * (day - duedate)
                 database.update_order_penalties(order_id, pen)
             elif duedate > day:
-                pen = early_pen * (duedate-day)
+                pen = early_pen * (duedate - day)
                 database.update_order_penalties(order_id, pen)
 
     # Fill the remaining positions with "null" if there aren't enough pieces
@@ -300,18 +298,19 @@ def continuous_processing():
         Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
     ]
     while True:
-        l = len(database.get_order_status("IN_PROGRESS"))
-        i = len(database.get_order_status("TBD"))
-        while l == 0 and i == 0:
-            l = len(database.get_order_status("IN_PROGRESS"))
-            i = len(database.get_order_status("TBD"))
+        condition1 = len(database.get_order_status("IN_PROGRESS"))
+        condition2 = len(database.get_order_status("TBD"))
+
+        while condition1 == 0 and condition2 == 0:
+            condition1 = len(database.get_order_status("IN_PROGRESS"))
+            condition2 = len(database.get_order_status("TBD"))
 
         # Get the current day from the database
         day = database.get_day()
         # Get a new batch of orders
         non_ordered_orders = database.get_order_status("IN_PROGRESS")
         tbd = False
-        # Sort orders by due date
+        # Sort orders by due date\
         orders = sorted(non_ordered_orders, key=lambda x: x[5])
         if len(orders) < 4:
             non_ordered_orders = database.get_order_status("TBD")
@@ -319,14 +318,15 @@ def continuous_processing():
             tbd = True
         supplier1_time = 0
         supplier2_time = 0
+        purchasing_plan = {}
 
         # Generate the purchasing plan for the day
-        if tbd == True:
+        if tbd is True:
             P_orders = database.get_order_path('{}')
             purchasing_plan = generate_purchasing_plan(orders, suppliers)
             for order in P_orders:
                 database.update_order_path(order[0], 'Bought')
-                calculo_de_custos(P_orders,purchasing_plan)
+                calculo_de_custos(P_orders, purchasing_plan)
 
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
@@ -352,13 +352,15 @@ def continuous_processing():
         elif p2_supplier == "Supplier C":
             supplier2_time = 1
         # Process the working orders
-        working_orders = process_working_orders(orders, day)
+        working_orders = process_working_orders(orders)
         # Process the completed orders and determine the delivery orders for the day
         delivery_orders = process_completed_orders(orders, day)
 
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
         delivery_orders = ', '.join(delivery_orders)
+        working_orders = sort_string_by_index(working_orders)
+
         database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy, supplier1_time,
                                 supplier2_time)
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
@@ -375,7 +377,7 @@ def continuous_processing():
             day = database.get_day()
 
 
-def calculo_de_custos(orders,purchasing_plan):
+def calculo_de_custos(orders, purchasing_plan):
     for order in orders:
         # Extract order information
         order_id = order[0]
@@ -419,7 +421,7 @@ def calculo_de_custos(orders,purchasing_plan):
 def penalty_calc(mps, orders):
     matched_mps = []
     pen = 0
-
+    due_date = 0
     for mp in mps:
         order_id = mp["order_id"]
         matching_order = None
@@ -435,6 +437,9 @@ def penalty_calc(mps, orders):
                 if order.id == order_id:
                     matching_order = order
                     break
+
+        late_penalty = 0
+        early_penalty = 0
 
         if matching_order:
             if isinstance(matching_order, tuple):
@@ -472,6 +477,33 @@ def penalty_calc(mps, orders):
 
     return pen
 
+
+def sort_string_by_index(string):
+    if string is None:
+        return None
+
+    mappings = {
+        'P3_from_P2': 40,
+        'P4_from_P2': 40,
+        'P5_from_P9': 45,
+        'P6_from_P1': 40,
+        'P6_from_P3': 50,
+        'P7_from_P4': 40,
+        'P8_from_P6': 90,
+        'P9_from_P7': 40,
+        'null': -1  # null is assigned the lowest index
+    }
+
+    # Split the string into individual elements
+    elements = string.split(', ')
+
+    # Sort the elements based on their indexes in reverse order
+    sorted_elements = sorted(elements, key=lambda x: mappings[x.strip()], reverse=True)
+
+    # Join the sorted elements back into a string
+    sorted_string = ', '.join(sorted_elements)
+
+    return sorted_string
 # day = database.get_day()
 # stock = database.get_warehouse(None)
 # purchasing_plan = generate_purchasing_plan(orders, suppliers)
@@ -505,7 +537,6 @@ def penalty_calc(mps, orders):
 #
 
 
-
 # suppliers = [
 #     Supplier('Supplier A', ['P1', 'P2'], 16, {'P1': 30, 'P2': 10}, {'P1': 4, 'P2': 4}),
 #     Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
@@ -518,7 +549,3 @@ def penalty_calc(mps, orders):
 #
 # # continuous_processing()
 # =======
-
-
-
-
