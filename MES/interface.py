@@ -215,20 +215,34 @@ class Ui_MainWindow(object):
         self.tableWidget_3.setColumnWidth(6, 85)
         self.tableWidget_3.setColumnWidth(7, 85)
         self.tableWidget_3.setColumnWidth(8, 85)
-        self.tableWidget_3.setColumnWidth(9, 85)
+        self.tableWidget_3.setColumnWidth(9, 88)
         self.tableWidget_3.setColumnWidth(10, 120)
         self.tableWidget_3.setColumnWidth(11, 115)
 
-        self.tableWidget_4.setColumnWidth(0, 105)
-        self.tableWidget_4.setColumnWidth(1, 105)
-        self.tableWidget_4.setColumnWidth(2, 105)
-        self.tableWidget_4.setColumnWidth(3, 105)
-        self.tableWidget_4.setColumnWidth(4, 105)
-        self.tableWidget_4.setColumnWidth(5, 105)
-        self.tableWidget_4.setColumnWidth(6, 105)
-        self.tableWidget_4.setColumnWidth(7, 105)
-        self.tableWidget_4.setColumnWidth(8, 100)
-        self.tableWidget_4.setColumnWidth(9, 115)
+        self.tableWidget_4.setColumnWidth(0, 84)
+        self.tableWidget_4.setColumnWidth(1, 95)
+        self.tableWidget_4.setColumnWidth(2, 95)
+        self.tableWidget_4.setColumnWidth(3, 95)
+        self.tableWidget_4.setColumnWidth(4, 95)
+        self.tableWidget_4.setColumnWidth(5, 95)
+        self.tableWidget_4.setColumnWidth(6, 95)
+        self.tableWidget_4.setColumnWidth(7, 95)
+        self.tableWidget_4.setColumnWidth(8, 95)
+        self.tableWidget_4.setColumnWidth(9, 95)
+        self.tableWidget_4.setColumnWidth(10, 120)
+
+        self.tableWidget_5.setColumnWidth(0, 110)
+        self.tableWidget_5.setColumnWidth(1, 110)
+        self.tableWidget_5.setColumnWidth(2, 110)
+        self.tableWidget_5.setColumnWidth(3, 105)
+        self.tableWidget_5.setColumnWidth(4, 105)
+        self.tableWidget_5.setColumnWidth(5, 105)
+        self.tableWidget_5.setColumnWidth(6, 105)
+        self.tableWidget_5.setColumnWidth(7, 105)
+        self.tableWidget_5.setColumnWidth(8, 105)
+        self.tableWidget_5.setColumnWidth(9, 100)
+
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -422,10 +436,11 @@ class Ui_MainWindow(object):
             self.tableWidget_5.setItem(rowWarehouse, 2, QtWidgets.QTableWidgetItem(Warehouse["P3"]))
             self.tableWidget_5.setItem(rowWarehouse, 3, QtWidgets.QTableWidgetItem(Warehouse["P4"]))
             self.tableWidget_5.setItem(rowWarehouse, 4, QtWidgets.QTableWidgetItem(Warehouse["P5"]))
-            self.tableWidget_5.setItem(rowWarehouse, 5, QtWidgets.QTableWidgetItem(Warehouse["P7"]))
-            self.tableWidget_5.setItem(rowWarehouse, 6, QtWidgets.QTableWidgetItem(Warehouse["P8"]))
-            self.tableWidget_5.setItem(rowWarehouse, 7, QtWidgets.QTableWidgetItem(Warehouse["P9"]))
-            self.tableWidget_5.setItem(rowWarehouse, 8, QtWidgets.QTableWidgetItem(Warehouse["Total"]))
+            self.tableWidget_5.setItem(rowWarehouse, 5, QtWidgets.QTableWidgetItem(Warehouse["P6"]))
+            self.tableWidget_5.setItem(rowWarehouse, 6, QtWidgets.QTableWidgetItem(Warehouse["P7"]))
+            self.tableWidget_5.setItem(rowWarehouse, 7, QtWidgets.QTableWidgetItem(Warehouse["P8"]))
+            self.tableWidget_5.setItem(rowWarehouse, 8, QtWidgets.QTableWidgetItem(Warehouse["P9"]))
+            self.tableWidget_5.setItem(rowWarehouse, 9, QtWidgets.QTableWidgetItem(Warehouse["Total"]))
             rowWarehouse = rowWarehouse + 1
 
 
