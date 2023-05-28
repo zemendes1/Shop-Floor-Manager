@@ -22,17 +22,39 @@ async def main():
     if daily_plan is not None:
         get_date, get_working_orders, get_delivery_orders, get_p1_tobuy, get_p2_tobuy, get_p1_arriving, get_p2_arriving = daily_plan
 
-        order1, order2, order3, order4 = get_working_orders.split(', ')
-        order1 = Piece.define_vector(order1)
-        order2 = Piece.define_vector(order2)
-        order3 = Piece.define_vector(order3)
-        order4 = Piece.define_vector(order4)
+        Machines = Assign_Machines.assign_machines(get_working_orders)
+        changed_indexes = []  # List to store the indexes that have changed
 
-        machine_order1, machine_order2, machine_order3, machine_order4 = Assign_Machines.assign_machines(get_working_orders).split(', ')
+        if "1, 2" in Machines:
+            index = Machines.index("1, 2")
+            Machines = Machines.replace("1, 2", "2, 1")
+            changed_indexes.append(index // 4)  # Add the index of where "1, 2" was found divided by 4 to the list of changed indexes
+
+        split_orders = get_working_orders.split(', ')
+
+        order1 = split_orders[0]
+        order2 = split_orders[1]
+        order3 = split_orders[2]
+        order4 = split_orders[3]
+
+        machine_order1, machine_order2, machine_order3, machine_order4 = Machines.split(', ')
         machine_order1 = int(machine_order1)
         machine_order2 = int(machine_order2)
         machine_order3 = int(machine_order3)
         machine_order4 = int(machine_order4)
+
+        for index in changed_indexes:
+            if index == 0:
+                order1, order2 = order2, order1  # Swap order1 and order2
+            elif index == 1:
+                order2, order3 = order3, order2  # Swap order2 and order3
+            elif index == 2:
+                order3, order4 = order4, order3  # Swap order3 and order4
+
+        order1 = Piece.define_vector(order1)
+        order2 = Piece.define_vector(order2)
+        order3 = Piece.define_vector(order3)
+        order4 = Piece.define_vector(order4)
 
         delivery1, delivery2, delivery3, delivery4, delivery5, delivery6, delivery7, delivery8 = get_delivery_orders.split(
             ', ')
