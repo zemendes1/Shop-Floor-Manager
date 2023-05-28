@@ -2,9 +2,11 @@ import asyncio
 from asyncua import Client
 from asyncua import ua
 import db
+
 import PieceTransformer as Piece
 import Transformer_to_Piece as Transformer
 from MES import dock_transformer
+from MES import Assign_Machines
 
 
 async def main():
@@ -12,6 +14,7 @@ async def main():
 
     delivery = [0, 0, 0, 0, 0, 0, 0, 0, 0]
     order1, order2, order3, order4 = 0, 0, 0, 0
+    machine_order1, machine_order2, machine_order3, machine_order4 = 0, 0, 0, 0
 
     # Get daily Plan
     current_day = db.get_day()
@@ -24,6 +27,12 @@ async def main():
         order2 = Piece.define_vector(order2)
         order3 = Piece.define_vector(order3)
         order4 = Piece.define_vector(order4)
+
+        machine_order1, machine_order2, machine_order3, machine_order4 = Assign_Machines.assign_machines(get_working_orders).split(', ')
+        machine_order1 = int(machine_order1)
+        machine_order2 = int(machine_order2)
+        machine_order3 = int(machine_order3)
+        machine_order4 = int(machine_order4)
 
         delivery1, delivery2, delivery3, delivery4, delivery5, delivery6, delivery7, delivery8 = get_delivery_orders.split(
             ', ')
@@ -53,11 +62,15 @@ async def main():
             # Write Working Order #1 of the day
             for i in range(1, 3):
                 for j in range(1, 3):
-                    node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao1[{}][{}]".format(i, j))
+                    node = client.get_node(
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao1[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order1[i - 1][j - 1], ua.VariantType.Int16))
             # Write day
             node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao1[3][1]")
             await node.write_value(ua.Variant(current_day, ua.VariantType.Int16))
+            # Write Machine
+            node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao1[3][2]")
+            await node.write_value(ua.Variant(machine_order1, ua.VariantType.Int16))
 
         if order2 != 0:
             # Write Working Order #2 of the day
@@ -69,16 +82,23 @@ async def main():
             # Write day
             node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao2[3][1]")
             await node.write_value(ua.Variant(current_day, ua.VariantType.Int16))
+            # Write Machine
+            node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao2[3][2]")
+            await node.write_value(ua.Variant(machine_order2, ua.VariantType.Int16))
 
         if order3 != 0:
             # Write Working Order #3 of the day
             for i in range(1, 3):
                 for j in range(1, 3):
-                    node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao3[{}][{}]".format(i, j))
+                    node = client.get_node(
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao3[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(order3[i - 1][j - 1], ua.VariantType.Int16))
             # Write day
             node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao3[3][1]")
             await node.write_value(ua.Variant(current_day, ua.VariantType.Int16))
+            # Write Machine
+            node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao3[3][2]")
+            await node.write_value(ua.Variant(machine_order3, ua.VariantType.Int16))
 
         if order4 != 0:
             # Write Working Order #4 of the day
@@ -90,15 +110,20 @@ async def main():
             # Write day
             node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao4[3][1]")
             await node.write_value(ua.Variant(current_day, ua.VariantType.Int16))
+            # Write Machine
+            node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Ordem_Producao4[3][2]")
+            await node.write_value(ua.Variant(machine_order4, ua.VariantType.Int16))
 
         if delivery[1] != 0:
             # Write Deliveries of the day
             for i in range(1, 9):
                 for j in range(1, 3):
-                    node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[{}][{}]".format(i, j))
+                    node = client.get_node(
+                        "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[{}][{}]".format(i, j))
                     await node.write_value(ua.Variant(delivery[i][j - 1], ua.VariantType.Int16))
             # Write day
-            node = client.get_node("ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[9][1]".format(i, j))
+            node = client.get_node(
+                "ns=4;s=|var|CODESYS Control Win V3 x64.Application.GVL.Delivery_Day[9][1]".format(i, j))
             await node.write_value(ua.Variant(current_day, ua.VariantType.Int16))
 
         # Ler Tempo de Funcionamento de cada máquina
