@@ -322,12 +322,8 @@ def continuous_processing():
         Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
         Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
     ]
-    arrivals1 = {
-        0 : 0
-    }
-    arrivals2 = {
-        0 : 0
-    }
+    arrivals1 = {}
+    arrivals2 = {}
 
     while True:
         condition1 = len(database.get_order_status("IN_PROGRESS"))
@@ -391,6 +387,14 @@ def continuous_processing():
             supplier2_time = 1 + day
             arrivals2[supplier2_time] = p2_tobuy
 
+        try:
+            arriving1 = arrivals1[day]
+        except KeyError:
+            arriving1 = 0
+        try:
+            arriving2 = arrivals2[day]
+        except KeyError:
+            arriving2 = 0
 
         # Process the working orders
         working_orders = process_working_orders(orders)
@@ -402,8 +406,8 @@ def continuous_processing():
         delivery_orders = ', '.join(delivery_orders)
         working_orders = sort_string_by_index(working_orders)
 
-        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy, arrivals1[day],
-                                arrivals2[day])
+        database.add_daily_plan(day, working_orders, delivery_orders, p1_tobuy, p2_tobuy, arriving1,
+                                arriving2)
 
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
               f"the following delivery_orders{delivery_orders}. The amount of P1 and P2 to buy are respectively {p1_tobuy},{p2_tobuy},"
