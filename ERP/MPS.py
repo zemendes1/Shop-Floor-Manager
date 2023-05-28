@@ -195,7 +195,7 @@ def process_working_orders(orders):
         "P8": ("P6", 45),
         "P9": ("P7", 25)
     }
-    found = False
+
     # Create an empty list to store the completed transformations
     completed_transformations = []
 
@@ -246,21 +246,25 @@ def process_working_orders(orders):
 
     # Add "null" to the completed transformations for any remaining positions
     completed_transformations += ["null"] * (4 - len(completed_transformations))
-    if "T1" in count_tool_usage(completed_transformations) and count_tool_usage(completed_transformations)["T1"] == 4:
-        completed_transformations[0] = "null"
 
-    if "T4" in count_tool_usage(completed_transformations) and count_tool_usage(completed_transformations)["T4"] == 4:
-        completed_transformations[0] = "null"
+    result = count_tool_usage(', '.join(completed_transformations))
 
-    if "T2" in count_tool_usage(completed_transformations) and count_tool_usage(completed_transformations)["T2"] == 4:
+    if 'T1' in result and result['T1'] == 4:
+        completed_transformations[3] = "null"
+
+    if 'T4' in result and result['T4'] == 4:
+        completed_transformations[3] = "null"
+
+    if 'T2' in result and result['T2'] == 4:
         i = 0
         while i < len(completed_transformations):
             if completed_transformations[i] == 'P3_from_P2':
                 completed_transformations[i] = "null"
                 break
             i += 1
+        result = count_tool_usage(', '.join(completed_transformations))
 
-    if "T2" in count_tool_usage(completed_transformations) and count_tool_usage(completed_transformations)["T2"] == 3:
+    if 'T2' in result and result['T2'] == 3:
         i = 0
         while i < len(completed_transformations):
             if completed_transformations[i] == 'P3_from_P2':
