@@ -344,17 +344,17 @@ def continuous_processing():
             non_ordered_orders = database.get_order_status("TBD")
             orders = sorted(non_ordered_orders, key=lambda x: x[5])
             tbd = True
-        supplier1_time = 0
-        supplier2_time = 0
         purchasing_plan = {}
 
         # Generate the purchasing plan for the day
         if tbd is True:
             p_orders = database.get_order_path('{}')
-            purchasing_plan = generate_purchasing_plan(orders, suppliers)
-            for order in p_orders:
-                database.update_order_path(order[0], 'Bought')
-                calculo_de_custos(p_orders, purchasing_plan)
+            print(p_orders)
+            if p_orders:
+                purchasing_plan = generate_purchasing_plan(p_orders, suppliers)
+                for order in p_orders:
+                    database.update_order_path(order[0], 'Bought')
+                    calculo_de_custos(p_orders, purchasing_plan)
 
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
