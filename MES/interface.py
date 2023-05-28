@@ -399,6 +399,8 @@ class Ui_MainWindow(object):
             self.tableWidget_2.setItem(rowDailyPlan, 2, QtWidgets.QTableWidgetItem(DailyPlan["Delivery_orders"]))
             self.tableWidget_2.setItem(rowDailyPlan, 3, QtWidgets.QTableWidgetItem(DailyPlan["P1_toBuy"]))
             self.tableWidget_2.setItem(rowDailyPlan, 4, QtWidgets.QTableWidgetItem(DailyPlan["P2_toBuy"]))
+            self.tableWidget_2.setItem(rowDailyPlan, 5, QtWidgets.QTableWidgetItem(DailyPlan["P1_Arriving "]))
+            self.tableWidget_2.setItem(rowDailyPlan, 6, QtWidgets.QTableWidgetItem(DailyPlan["P2_Arriving "]))
             rowDailyPlan = rowDailyPlan + 1
 
         for Facilities in testeFacilities:
