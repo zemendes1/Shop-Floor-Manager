@@ -370,22 +370,33 @@ def continuous_processing():
         if p1_supplier == "Supplier A":
             supplier1_time = 4 + day
             arrivals1[supplier1_time] = p1_tobuy
-
+            if arrivals1[supplier1_time] >= 6:
+                arrivals1[supplier1_time+1] = -1*(6-(p1_tobuy+arrivals1[supplier1_time+1]))
         elif p1_supplier == "Supplier B":
             supplier1_time = 2 + day
             arrivals1[supplier1_time] = p1_tobuy
+            if arrivals1[supplier1_time] >= 6:
+                arrivals1[supplier1_time+1] = -1*(6-(p1_tobuy+arrivals1[supplier1_time+1]))
         elif p1_supplier == "Supplier C":
             supplier1_time = 1 + day
             arrivals1[supplier1_time] = p1_tobuy
+            if arrivals1[supplier1_time] >= 6:
+                arrivals1[supplier1_time+1] = -1*(6-(p1_tobuy+arrivals1[supplier1_time+1]))
         if p2_supplier == "Supplier A":
             supplier2_time = 4 + day
             arrivals2[supplier2_time] = p2_tobuy
+            if arrivals1[supplier2_time] >= 6:
+                arrivals2[supplier2_time+1] = -1*(6-(p2_tobuy+arrivals2[supplier2_time+1]))
         elif p2_supplier == "Supplier B":
             supplier2_time = 2 + day
             arrivals2[supplier2_time] = p2_tobuy
+            if arrivals1[supplier2_time] >= 6:
+                arrivals2[supplier2_time+1] = -1*(6-(p2_tobuy+arrivals2[supplier2_time+1]))
         elif p2_supplier == "Supplier C":
             supplier2_time = 1 + day
             arrivals2[supplier2_time] = p2_tobuy
+            if arrivals1[supplier2_time] >= 6:
+                arrivals2[supplier2_time+1] = -1*(6-(p2_tobuy+arrivals2[supplier2_time+1]))
 
         try:
             arriving1 = arrivals1[day]
