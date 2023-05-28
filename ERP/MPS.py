@@ -504,6 +504,56 @@ def sort_string_by_index(string):
     sorted_string = ', '.join(sorted_elements)
 
     return sorted_string
+
+
+def count_tool_usage(string):
+    """
+    Counts the number of times each tool is used based on the input string.
+
+    Args:
+        string (str): A string of the format "x, x, x, x" where each 'x' represents a piece transformation.
+
+    Returns:
+        dict: A dictionary containing the count of each tool used in the input string.
+              The keys are the tool names, and the values are the corresponding counts.
+              If the input string is None, returns None.
+    """
+
+    # If the input string is None, return None
+    if string is None:
+        return {}
+
+    # Define the mappings from source to target tools
+    mappings = {
+        'P3_from_P2': "T2",
+        'P4_from_P2': "T3",
+        'P5_from_P9': "T4",
+        'P6_from_P1': "T1",
+        'P6_from_P3': "T1",
+        'P7_from_P4': "T4",
+        'P8_from_P6': "T3",
+        'P9_from_P7': "T3"
+    }
+
+    # Create an empty dictionary to store the count of each tool
+    tools_count = {}
+
+    # Split the input string by comma and iterate over each tool mapping
+    for mapping in string.split(','):
+        # Remove leading and trailing whitespaces from the mapping
+        mapping = mapping.strip()
+
+        # Check if the mapping is present in the defined mappings
+        if mapping in mappings:
+            # Get the corresponding tool for the mapping
+            tool = mappings[mapping]
+
+            # Increment the count of the tool in the tools_count dictionary
+            tools_count[tool] = tools_count.get(tool, 0) + 1
+
+    # Return the dictionary containing the count of each tool
+    return tools_count
+
 # day = database.get_day()
 # stock = database.get_warehouse(None)
 # purchasing_plan = generate_purchasing_plan(orders, suppliers)
