@@ -30,6 +30,13 @@ async def main():
             Machines = Machines.replace("1, 2", "2, 1")
             changed_indexes.append(index // 4)  # Add the index of where "1, 2" was found divided by 4 to the list of changed indexes
 
+        # Additional check to swap "1" and "2" if "1" appears before "2"
+        if "1" in Machines and "2" in Machines:
+            index_1 = Machines.index("1")
+            index_2 = Machines.index("2")
+            if index_1 < index_2:
+                Machines = Machines[:index_1] + "2" + Machines[index_1 + 1:index_2] + "1" + Machines[index_2 + 1:]
+
         split_orders = get_working_orders.split(', ')
 
         order1 = split_orders[0]
