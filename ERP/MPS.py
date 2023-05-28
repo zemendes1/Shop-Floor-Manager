@@ -411,7 +411,7 @@ def continuous_processing():
 
         print(f"Adding to database on day {day}, the following working orders: {working_orders}, "
               f"the following delivery_orders{delivery_orders}. The amount of P1 and P2 to buy are respectively {p1_tobuy},{p2_tobuy},"
-              f" today arrive {arrivals1[supplier1_time]} P1s and  {arrivals2[supplier2_time]} P2s")
+              f" today arrive {arriving1} P1s and  {arriving2} P2s")
         # Wait for 60 seconds before processing the next day
 
         print("Penalties:")
