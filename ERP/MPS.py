@@ -149,13 +149,7 @@ def generate_purchasing_plan(orders, suppliers):
 
         # Add the quantity to the purchasing plan for the corresponding workpiece type
         purchasing_plan.setdefault(required_workpiece_type, 0)
-        if purchasing_plan[required_workpiece_type] >= 8:
-            database.update_order_path(order[0], "BOUGHT")
-            break
         purchasing_plan[required_workpiece_type] += quantity
-        if purchasing_plan[required_workpiece_type] >= 8:
-            database.update_order_path(order[0], "BOUGHT")
-            break
 
     purchasing_plan[required_workpiece_type] -= database.get_warehouse(required_workpiece_type)
 
@@ -356,9 +350,11 @@ def continuous_processing():
 
         # Generate the purchasing plan for the day
         if tbd is True:
-            P_orders = database.get_order_path('{}')
+            p_orders = database.get_order_path('{}')
             purchasing_plan = generate_purchasing_plan(orders, suppliers)
-            calculo_de_custos(P_orders, purchasing_plan)
+            for order in p_orders:
+                database.update_order_path(order[0], 'Bought')
+                calculo_de_custos(p_orders, purchasing_plan)
 
         # Generate the mps
         mps = generate_mps(orders, day, purchasing_plan)
@@ -374,6 +370,7 @@ def continuous_processing():
         if p1_supplier == "Supplier A":
             supplier1_time = 4 + day
             arrivals1[supplier1_time] = p1_tobuy
+
         elif p1_supplier == "Supplier B":
             supplier1_time = 2 + day
             arrivals1[supplier1_time] = p1_tobuy
