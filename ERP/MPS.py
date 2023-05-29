@@ -3,7 +3,8 @@ import time
 
 
 class Order:
-    def __init__(self, identifier, client, order_number, workpiece_type, quantity, due_date, delay_penalty, advance_penalty,
+    def __init__(self, identifier, client, order_number, workpiece_type, quantity, due_date, delay_penalty,
+                 advance_penalty,
                  path, status):
         self.id = identifier
         self.client = client
@@ -241,7 +242,7 @@ def process_working_orders(orders):
             break
 
     # Add "null" to the completed transformations for any remaining positions
-    completed_transformations += ["null"] * (8 - len(completed_transformations))
+    completed_transformations += ["null"] * (4 - len(completed_transformations))
 
     result = count_tool_usage(', '.join(completed_transformations))
 
@@ -271,6 +272,7 @@ def process_working_orders(orders):
     return completed_transformations
 
 
+# Esta função está mal não devia ver o warehouse só porque desta forma pode pegar em peças que são de outro order
 def process_completed_orders(day):
     orders = database.get_order_status('IN_PROGRESS')
     completed_orders = []
@@ -293,7 +295,6 @@ def process_completed_orders(day):
         duedate = order[5]
         late_pen = order[6]
         early_pen = order[7]
-        deliveries = 0
         # Check if the requested workpiece is in stock and in the correct quantity
         if pieces[workpiece] >= quantity:
             # se quantidade for menor do que o que ainda é possível de entregar hoje
@@ -302,14 +303,14 @@ def process_completed_orders(day):
                 # Update the stock by deducting the processed quantity
                 print(f"Delivered {workpiece}")
                 pieces[workpiece] -= quantity
-                deliveries += quantity
-                # Determine the dock number based on the count of strings ending with the number 1
-                dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
 
                 database.update_order_status(order_id, "DONE")
                 for i in range(quantity):
+                    # Determine the dock number based on the count of strings ending with the number 1
+                    dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
                     # Create the tuple and append it to the completed orders list
                     completed_orders.append(f"{workpiece}_on_{dock_number}")
+
             if duedate == day:
                 pen = 0
                 database.update_order_penalties(order_id, pen)
