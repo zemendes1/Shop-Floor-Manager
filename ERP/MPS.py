@@ -230,11 +230,7 @@ def process_working_orders(orders):
                 # Add the completed transformation to the list
                 completed_transformations.append(f"{prev_next_piece}_from_{starting_workpiece}")
 
-                # Update the order status
-                if database.get_warehouse(desired_piece) >= quantity:
-                    database.update_order_status(order_id, "DONE")
-                else:
-                    database.update_order_status(order_id, "IN_PROGRESS")
+                database.update_order_status(order_id, "IN_PROGRESS")
 
                 # Check if the maximum number of transformations for the day has been reached
                 if len(completed_transformations) >= 4:
@@ -245,7 +241,7 @@ def process_working_orders(orders):
             break
 
     # Add "null" to the completed transformations for any remaining positions
-    completed_transformations += ["null"] * (4 - len(completed_transformations))
+    completed_transformations += ["null"] * (8 - len(completed_transformations))
 
     result = count_tool_usage(', '.join(completed_transformations))
 
@@ -275,7 +271,8 @@ def process_working_orders(orders):
     return completed_transformations
 
 
-def process_completed_orders(orders, day):
+def process_completed_orders(day):
+    orders = database.get_order_status('IN_PROGRESS')
     completed_orders = []
     # Get the orders with the same due date as the current day
     due_orders = [order for order in orders if order[5] <= day]
@@ -299,16 +296,20 @@ def process_completed_orders(orders, day):
         deliveries = 0
         # Check if the requested workpiece is in stock and in the correct quantity
         if pieces[workpiece] >= quantity:
-            while pieces[workpiece] >= quantity > deliveries and len(completed_orders) < 8:
+            # se quantidade for menor do que o que ainda é possível de entregar hoje
+            # e as completed_orders forem menos de 8
+            if quantity < 8 - len(completed_orders) and len(completed_orders) < 8:
                 # Update the stock by deducting the processed quantity
                 print(f"Delivered {workpiece}")
-                pieces[workpiece] -= 1
-                deliveries += 1
+                pieces[workpiece] -= quantity
+                deliveries += quantity
                 # Determine the dock number based on the count of strings ending with the number 1
                 dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
 
-                # Create the tuple and append it to the completed orders list
-                completed_orders.append(f"{workpiece}_on_{dock_number}")
+                database.update_order_status(order_id, "DONE")
+                for i in range(quantity):
+                    # Create the tuple and append it to the completed orders list
+                    completed_orders.append(f"{workpiece}_on_{dock_number}")
             if duedate == day:
                 pen = 0
                 database.update_order_penalties(order_id, pen)
@@ -409,7 +410,7 @@ def continuous_processing():
         # Process the working orders
         working_orders = process_working_orders(orders)
         # Process the completed orders and determine the delivery orders for the day
-        delivery_orders = process_completed_orders(orders, day)
+        delivery_orders = process_completed_orders(day)
 
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
