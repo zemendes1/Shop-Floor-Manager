@@ -299,7 +299,7 @@ def process_completed_orders(orders, day):
         deliveries = 0
         # Check if the requested workpiece is in stock and in the correct quantity
         if pieces[workpiece] >= quantity:
-            while pieces[workpiece] > quantity > deliveries and len(completed_orders) < 8:
+            while pieces[workpiece] >= quantity > deliveries and len(completed_orders) < 8:
                 # Update the stock by deducting the processed quantity
                 print(f"Delivered {workpiece}")
                 pieces[workpiece] -= 1
