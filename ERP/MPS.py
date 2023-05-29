@@ -388,21 +388,21 @@ def continuous_processing():
         if p2_supplier == "Supplier A":
             supplier2_time = 4 + day
             if supplier2_time not in arrivals1:
-                arrivals1[supplier2_time] = p2_tobuy
+                arrivals2[supplier2_time] = p2_tobuy
             else:
-                arrivals1[supplier2_time] += p2_tobuy
+                arrivals2[supplier2_time] += p2_tobuy
         elif p2_supplier == "Supplier B":
             supplier2_time = 2 + day
             if supplier2_time not in arrivals1:
-                arrivals1[supplier2_time] = p2_tobuy
+                arrivals2[supplier2_time] = p2_tobuy
             else:
-                arrivals1[supplier2_time] += p2_tobuy
+                arrivals2[supplier2_time] += p2_tobuy
         elif p2_supplier == "Supplier C":
             supplier2_time = 1 + day
             if supplier2_time not in arrivals1:
-                arrivals1[supplier2_time] = p2_tobuy
+                arrivals2[supplier2_time] = p2_tobuy
             else:
-                arrivals1[supplier2_time] += p2_tobuy
+                arrivals2[supplier2_time] += p2_tobuy
 
         try:
             arriving1 = arrivals1[day]
