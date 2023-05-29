@@ -31,7 +31,7 @@ if __name__ == '__main__':
     db.create_table("docks_total")
     db.create_table("facilities_total")
     db.create_table("unloaded")
-
+    db.create_table("arrivals")
     # add this check and freeze_support() call
     multiprocessing.freeze_support()
 

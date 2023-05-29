@@ -13,8 +13,8 @@ def connect_to_database():
 
     mydb = psycopg2.connect(
         # Uncomment the following line to use a local database
-        # host="localhost",
-        host="db.fe.up.pt",
+        host="localhost",
+        # host="db.fe.up.pt",
         user="up201906869",
         password="infi2023",
         database="up201906869"
@@ -123,6 +123,12 @@ def create_table(_table):
                         "P8 INT CHECK (P8 >= 0)," \
                         "P9 INT CHECK (P9 >= 0)" \
                         ");"
+    elif _table == "arrivals":
+        create_script = "CREATE TABLE IF NOT EXISTS arrivals (" \
+                        "day INT CHECK (day >= 0)," \
+                        "P1 INT CHECK (P1 >= 0)," \
+                        "P2 INT CHECK (P2 >= 0)" \
+                        ");"
     elif _table == "docks_total":
         create_script = "CREATE OR REPLACE VIEW docks_total AS SELECT " \
                         "num,P1,P2,P3,P4,P5,P6,P7,P8,P9,(P1 + P2 + P3 + P4 + P5 + P6 + P7 + P8 + P9) AS Total " \
@@ -193,6 +199,43 @@ def get_order(id_order):
         order_values = mycursor.fetchone()
         mydb.commit()
     return order_values
+
+
+def add_arrivals(day, P1, P2):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    # Check if entry with given id_order already exists
+    mycursor.execute("SELECT * FROM arrivals WHERE day = %s", (day,))
+    existing_entry = mycursor.fetchall()
+
+    # If entry exists, do not add new order and return -1
+    if existing_entry:
+        existing_p1 = existing_entry[0][1]
+        existing_p2 = existing_entry[0][2]
+        query = "UPDATE arrivals SET P1 = '{}',P2  = '{}' WHERE day = '{}';".format(P1 + existing_p1, P2 + existing_p2, day)
+        mycursor.execute(query)
+        mydb.commit()
+        return 0
+
+    # If entry does not exist, add new order to database
+    new_order = "INSERT INTO arrivals (day, P1, P2) VALUES (%s, %s, %s)"
+    values = (day, P1, P2)
+    mycursor.execute(new_order, values)
+    mydb.commit()
+    return 0
+
+
+def get_arrivals(day):
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "SELECT * FROM arrivals WHERE day= {}".format(day)
+    mycursor.execute(query)
+    arrival_values = mycursor.fetchall()
+    mydb.commit()
+
+    return arrival_values
 
 
 def get_order_status_table(id_order):
@@ -682,6 +725,15 @@ def erase_day():
     mydb.commit()
 
 
+def erase_arrivals():
+    connect_to_database()
+    mycursor = mydb.cursor()
+
+    query = "DELETE FROM arrivals;"
+    mycursor.execute(query)
+    mydb.commit()
+
+
 def convert_ms_to_postgre_time(ms):
     delta = datetime.timedelta(milliseconds=ms)
     microseconds = delta.microseconds
@@ -757,6 +809,8 @@ def db_startup():
     erase_unloaded()
     add_unloaded(0, 0, 0, 0, 0, 0, 0, 0, 0)
     erase_order_status()
+
+    erase_arrivals()
 
     now_time = tm.time() * 1000.0
     insert_or_update_time(0, now_time)

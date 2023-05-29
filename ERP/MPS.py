@@ -322,8 +322,6 @@ def continuous_processing():
         Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
         Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
     ]
-    arrivals1 = {}
-    arrivals2 = {}
 
     while True:
         condition1 = len(database.get_order_status("IN_PROGRESS"))
@@ -369,49 +367,34 @@ def continuous_processing():
 
         if p1_supplier == "Supplier A":
             supplier1_time = 4 + day
-            if supplier1_time not in arrivals1:
-                arrivals1[supplier1_time] = p1_tobuy
-            else:
-                arrivals1[supplier1_time] += p1_tobuy
+            database.add_arrivals(supplier1_time, p1_tobuy, 0)
         elif p1_supplier == "Supplier B":
             supplier1_time = 2 + day
-            if supplier1_time not in arrivals1:
-                arrivals1[supplier1_time] = p1_tobuy
-            else:
-                arrivals1[supplier1_time] += p1_tobuy
+            database.add_arrivals(supplier1_time, p1_tobuy, 0)
         elif p1_supplier == "Supplier C":
             supplier1_time = 1 + day
-            if supplier1_time not in arrivals1:
-                arrivals1[supplier1_time] = p1_tobuy
-            else:
-                arrivals1[supplier1_time] += p1_tobuy
+            database.add_arrivals(supplier1_time, p1_tobuy, 0)
         if p2_supplier == "Supplier A":
             supplier2_time = 4 + day
-            if supplier2_time not in arrivals1:
-                arrivals2[supplier2_time] = p2_tobuy
-            else:
-                arrivals2[supplier2_time] += p2_tobuy
+            database.add_arrivals(supplier2_time, 0, p2_tobuy)
         elif p2_supplier == "Supplier B":
             supplier2_time = 2 + day
-            if supplier2_time not in arrivals1:
-                arrivals2[supplier2_time] = p2_tobuy
-            else:
-                arrivals2[supplier2_time] += p2_tobuy
+            database.add_arrivals(supplier2_time, 0, p2_tobuy)
         elif p2_supplier == "Supplier C":
             supplier2_time = 1 + day
-            if supplier2_time not in arrivals1:
-                arrivals2[supplier2_time] = p2_tobuy
-            else:
-                arrivals2[supplier2_time] += p2_tobuy
+            database.add_arrivals(supplier2_time, 0, p2_tobuy)
 
-        try:
-            arriving1 = arrivals1[day]
-        except KeyError:
+        p1_arriving = database.get_arrivals(day)
+        if not p1_arriving:
             arriving1 = 0
-        try:
-            arriving2 = arrivals2[day]
-        except KeyError:
+        else:
+            arriving1 = p1_arriving[0][1]
+
+        p2_arriving = database.get_arrivals(day)
+        if not p2_arriving:
             arriving2 = 0
+        else:
+            arriving2 = p2_arriving[0][2]
 
         # Process the working orders
         working_orders = process_working_orders(orders)
