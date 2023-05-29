@@ -287,17 +287,18 @@ def process_completed_orders(orders, day):
         duedate = order[5]
         late_pen = order[6]
         early_pen = order[7]
-
+        deliveries = 0
         # Check if the requested workpiece is in stock and in the correct quantity
         if database.get_warehouse(workpiece) >= quantity:
-            # Update the stock by deducting the processed quantity
-            print(f"Delivered {workpiece}")
+            while database.get_warehouse(workpiece) >= quantity > deliveries and len(completed_orders) < 8:
+                # Update the stock by deducting the processed quantity
+                print(f"Delivered {workpiece}")
+                deliveries += 1
+                # Determine the dock number based on the count of strings ending with the number 1
+                dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
 
-            # Determine the dock number based on the count of strings ending with the number 1
-            dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
-
-            # Create the tuple and append it to the completed orders list
-            completed_orders.append(f"{workpiece}_on_{dock_number}")
+                # Create the tuple and append it to the completed orders list
+                completed_orders.append(f"{workpiece}_on_{dock_number}")
             if duedate == day:
                 pen = 0
                 database.update_order_penalties(order_id, pen)
