@@ -280,6 +280,15 @@ def process_completed_orders(orders, day):
     # Get the orders with the same due date as the current day
     due_orders = [order for order in orders if order[5] <= day]
     # Check the stock for each due order
+    pieces = {
+        "P3": database.get_warehouse("P3"),
+        "P4": database.get_warehouse("P4"),
+        "P5": database.get_warehouse("P5"),
+        "P6": database.get_warehouse("P6"),
+        "P7": database.get_warehouse("P7"),
+        "P8": database.get_warehouse("P8"),
+        "P9": database.get_warehouse("P9")
+    }
     for order in due_orders:
         order_id = order[0]
         workpiece = order[3]
@@ -289,10 +298,11 @@ def process_completed_orders(orders, day):
         early_pen = order[7]
         deliveries = 0
         # Check if the requested workpiece is in stock and in the correct quantity
-        if database.get_warehouse(workpiece) >= quantity:
-            while database.get_warehouse(workpiece) >= quantity > deliveries and len(completed_orders) < 8:
+        if pieces[workpiece] >= quantity:
+            while pieces[workpiece] > quantity > deliveries and len(completed_orders) < 8:
                 # Update the stock by deducting the processed quantity
                 print(f"Delivered {workpiece}")
+                pieces[workpiece] -= 1
                 deliveries += 1
                 # Determine the dock number based on the count of strings ending with the number 1
                 dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
@@ -323,7 +333,6 @@ def continuous_processing():
         Supplier('Supplier B', ['P1', 'P2'], 8, {'P1': 45, 'P2': 15}, {'P1': 2, 'P2': 2}),
         Supplier('Supplier C', ['P1', 'P2'], 4, {'P1': 55, 'P2': 18}, {'P1': 1, 'P2': 1})
     ]
-
     while True:
         condition1 = len(database.get_order_status("IN_PROGRESS"))
         condition2 = len(database.get_order_status("TBD"))
