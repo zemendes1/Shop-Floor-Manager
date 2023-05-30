@@ -1,7 +1,7 @@
 import asyncio
 from asyncua import Client
 from asyncua import ua
-import db
+from DB import db
 
 import PieceTransformer as Piece
 import Transformer_to_Piece as Transformer

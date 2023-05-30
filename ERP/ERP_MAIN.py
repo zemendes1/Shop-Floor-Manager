@@ -2,7 +2,7 @@ import multiprocessing
 from ERP import receive_xml
 from ERP import interfaceErp
 from ERP import MPS
-from MES import db
+from DB import db
 
 
 def execute_xml():

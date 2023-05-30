@@ -1,4 +1,4 @@
-from MES import db
+from DB import db
 
 
 def convert_string_facilities(input_str):

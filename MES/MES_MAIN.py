@@ -1,7 +1,7 @@
 from MES import opcua
 from MES import interface as inter
 import multiprocessing
-from MES import db
+from DB import db
 import time
 
 

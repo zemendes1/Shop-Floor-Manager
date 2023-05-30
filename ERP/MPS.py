@@ -1,5 +1,4 @@
-import MES.db as database
-import time
+import DB.db as database
 
 
 class Order:

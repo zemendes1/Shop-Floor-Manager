@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as et
 import socket
-import MES.db
+import DB.db
 
 
 class Xml:
@@ -68,5 +68,5 @@ def run_xml():
     xml.xml2string()
     nameID, number, workpiece, quantity, duedate, latepen, earlypen = xml.get_order()
     for i in range(len(number)):
-        MES.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
-                         earlypen[i], '{}', 'TBD', 0, 0)
+        DB.db.add_order(number[i], nameID, number[i], workpiece[i], quantity[i], duedate[i], latepen[i],
+                        earlypen[i], '{}', 'TBD', 0, 0)
