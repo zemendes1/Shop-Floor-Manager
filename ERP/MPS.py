@@ -1,16 +1,6 @@
 import DB.db as database
 
-pieces = {
-        "P1": 0,
-        "P2": 0,
-        "P3": 0,
-        "P4": 0,
-        "P5": 0,
-        "P6": 0,
-        "P7": 0,
-        "P8": 0,
-        "P9": 0
-    }
+global pieces
 
 
 class Order:
