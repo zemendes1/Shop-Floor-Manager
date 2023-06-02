@@ -1,8 +1,5 @@
 import DB.db as database
 
-global pieces
-
-
 class Order:
     def __init__(self, identifier, client, order_number, workpiece_type, quantity, due_date, delay_penalty,
                  advance_penalty,
@@ -185,7 +182,7 @@ def generate_purchasing_plan(orders, suppliers):
     return purchasing_plan
 
 
-def process_working_orders(orders):
+def process_working_orders(orders,pieces):
     # Define the transformation times for each workpiece
     # Goal piece : transformation pieces, time
     transformation_times = {
@@ -328,7 +325,7 @@ def process_completed_orders(day):
     remaining_positions = 8 - len(completed_orders)
     completed_orders.extend(["null"] * remaining_positions)
 
-    return completed_orders
+    return completed_orders,pieces
 
 
 def continuous_processing():
@@ -412,10 +409,9 @@ def continuous_processing():
             arriving2 = p2_arriving[0][2]
 
         # Process the completed orders and determine the delivery orders for the day
-        delivery_orders = process_completed_orders(day)
-        print(pieces)
+        delivery_orders,pieces = process_completed_orders(day)
         # Process the working orders
-        working_orders = process_working_orders(orders)
+        working_orders = process_working_orders(orders, pieces)
 
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
