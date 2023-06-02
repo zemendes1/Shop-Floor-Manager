@@ -306,10 +306,12 @@ def process_completed_orders(day):
 
                 database.update_order_status(order_id, "DONE")
                 for i in range(quantity):
+                    database.update_order_status(order_id, "DONE")
                     # Determine the dock number based on the count of strings ending with the number 1
                     dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
                     # Create the tuple and append it to the completed orders list
                     completed_orders.append(f"{workpiece}_on_{dock_number}")
+                    database.update_order_status(order_id, "DONE")
 
             if duedate == day:
                 pen = 0
