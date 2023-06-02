@@ -43,8 +43,8 @@ def create_table(_table):
                         ");"
     elif _table == "order_status":
         create_script = " CREATE TABLE IF NOT EXISTS order_status(" \
-                        "id INT PRIMARY KEY," \
-                        "OrderNumber INT," \
+                        "id INT REFERENCES orders(id) NOT NULL," \
+                        "OrderNumber INT REFERENCES orders(OrderNumber) NOT NULL," \
                         "done_pieces varchar(200) NOT NULL," \
                         "pending_pieces varchar(200) NOT NULL," \
                         "total INT not null," \
@@ -52,7 +52,7 @@ def create_table(_table):
                         ");"
     elif _table == "dailyplan":
         create_script = "CREATE TABLE IF NOT EXISTS dailyPlan (" \
-                        "date INT CHECK (date >=0)," \
+                        "date INT REFERENCES day(day) CHECK (date >=0)," \
                         "Working_orders varchar(300)," \
                         "Delivery_orders varchar(300), " \
                         "P1_toBuy INT CHECK (P1_toBuy >= 0)," \
@@ -95,7 +95,7 @@ def create_table(_table):
                         ");"
     elif _table == "day":
         create_script = "CREATE TABLE IF NOT EXISTS day (" \
-                        "day INT not null," \
+                        "day INT PRIMARY KEY NOT NULL," \
                         "time_elapsed TIME NOT NULL," \
                         "begin_time numeric(18, 4) " \
                         ");"
@@ -125,7 +125,7 @@ def create_table(_table):
                         ");"
     elif _table == "arrivals":
         create_script = "CREATE TABLE IF NOT EXISTS arrivals (" \
-                        "day INT CHECK (day >= 0)," \
+                        "day INT REFERENCES day(day) CHECK (day >= 0) ," \
                         "P1 INT CHECK (P1 >= 0)," \
                         "P2 INT CHECK (P2 >= 0)" \
                         ");"
@@ -213,7 +213,8 @@ def add_arrivals(day, P1, P2):
     if existing_entry:
         existing_p1 = existing_entry[0][1]
         existing_p2 = existing_entry[0][2]
-        query = "UPDATE arrivals SET P1 = '{}',P2  = '{}' WHERE day = '{}';".format(P1 + existing_p1, P2 + existing_p2, day)
+        query = "UPDATE arrivals SET P1 = '{}',P2  = '{}' WHERE day = '{}';".format(P1 + existing_p1, P2 + existing_p2,
+                                                                                    day)
         mycursor.execute(query)
         mydb.commit()
         return 0
@@ -641,8 +642,7 @@ def remove_piece_from_warehouse(piece_type, number_of_pieces):
     mycursor = mydb.cursor()
 
     if piece_type is not None:
-        query = "SELECT * FROM warehouse"
-        mycursor.execute(query)
+        mycursor.execute("SELECT * FROM warehouse")
         warehouse_values = mycursor.fetchall()
         mydb.commit()
         p1, p2, p3, p4, p5, p6, p7, p8, p9 = warehouse_values[0]
