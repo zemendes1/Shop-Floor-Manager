@@ -182,7 +182,7 @@ def generate_purchasing_plan(orders, suppliers):
     return purchasing_plan
 
 
-def process_working_orders(orders,pieces):
+def process_working_orders(orders, pieces):
     # Define the transformation times for each workpiece
     # Goal piece : transformation pieces, time
     transformation_times = {
@@ -306,12 +306,10 @@ def process_completed_orders(day):
 
                 database.update_order_status(order_id, "DONE")
                 for i in range(quantity):
-                    database.update_order_status(order_id, "DONE")
                     # Determine the dock number based on the count of strings ending with the number 1
                     dock_number = 1 if sum([1 for item in completed_orders if item.endswith("_on_1")]) < 4 else 2
                     # Create the tuple and append it to the completed orders list
                     completed_orders.append(f"{workpiece}_on_{dock_number}")
-                    database.update_order_status(order_id, "DONE")
 
             if duedate == day:
                 pen = 0
@@ -411,7 +409,11 @@ def continuous_processing():
             arriving2 = p2_arriving[0][2]
 
         # Process the completed orders and determine the delivery orders for the day
-        delivery_orders,pieces = process_completed_orders(day)
+        delivery_orders, pieces = process_completed_orders(day)
+        non_ordered_orders = database.get_order_status("IN_PROGRESS")
+
+        # Sort orders by due date\
+        orders = sorted(non_ordered_orders, key=lambda x: x[5])
         # Process the working orders
         working_orders = process_working_orders(orders, pieces)
 
