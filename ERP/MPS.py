@@ -1,5 +1,7 @@
 import DB.db as database
 
+global pieces
+
 
 class Order:
     def __init__(self, identifier, client, order_number, workpiece_type, quantity, due_date, delay_penalty,
@@ -215,15 +217,15 @@ def process_working_orders(orders):
             val = transformation_times[starting_workpiece]
             queue.append(val)
             starting_workpiece = val[0]
-            if database.get_warehouse(starting_workpiece) >= quantity:
+            if pieces(starting_workpiece) >= quantity:
                 break
             next_piece = val[0]
         # Check if the starting workpiece is in stock
-        if database.get_warehouse(starting_workpiece) > 0:
+        if pieces(starting_workpiece) > 0:
             # Iterate over the transformations for the starting workpiece
 
             # Check if there are enough pieces in stock to perform the transformation
-            if database.get_warehouse(starting_workpiece) >= 1:
+            if pieces(starting_workpiece) >= 1:
                 # Perform the transformation
                 print(f"Transforming {starting_workpiece} into {prev_next_piece}")
 
@@ -407,10 +409,10 @@ def continuous_processing():
         else:
             arriving2 = p2_arriving[0][2]
 
-        # Process the working orders
-        working_orders = process_working_orders(orders)
         # Process the completed orders and determine the delivery orders for the day
         delivery_orders = process_completed_orders(day)
+        # Process the working orders
+        working_orders = process_working_orders(orders)
 
         # Insert the daily plan into the database
         working_orders = ', '.join(working_orders)
